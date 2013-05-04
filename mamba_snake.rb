@@ -15,9 +15,7 @@
 - just keep throwing yourself at the problem!
 - rabbit can leave the map
 - top level game should control the map and snake and rabbits
-- when the game starts the snake does not immediately move
 - if rabbit walled in by snake, rabbit turns and goes different direction
-- sometimes the snake does not eat the rabbit
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
 - snake does not die when it collides with wall or itself
@@ -123,18 +121,10 @@ class Mamba
     @direction = :right
 
     @parts = []
-    (10..15).each { |n| @parts << [map_width / 2, map_height / 2] }
+    # Doing it this way will cause a bug where the snake
+    # won't collide with itself properly.
+    (10..15).each { @parts << [map_width / 2, map_height / 2] }
     @pos = parts.shift
-  end
-
-  def direction(id)
-    @direction = case id
-                 when Gosu::KbRight then @direction == :left ? @direction : :right
-                 when Gosu::KbUp    then @direction == :down ? @direction : :up
-                 when Gosu::KbLeft  then @direction == :right ? @direction : :left
-                 when Gosu::KbDown  then @direction == :up ? @direction : :down
-                 else @direction
-                 end
   end
 
   def update
@@ -150,12 +140,27 @@ class Mamba
                 else 0
                 end
 
-    @parts << [@pos[0], @pos[1]]
-    @parts.shift
+    # pushes new head on start of snake, pops end
+    @parts.unshift [@pos[0], @pos[1]]
+    @parts.pop
   end
 
   def grow
-    5.times { @parts.unshift(@pos) }
+    # pushes current spot on end of snake
+    # Because the snake will have the same x, y coordinates multiple times,
+    # it will not properly collide with itself.
+    5.times { @parts << @pos }
+    p @parts
+  end
+
+  def direction(id)
+    @direction = case id
+                 when Gosu::KbRight then @direction == :left ? @direction : :right
+                 when Gosu::KbUp    then @direction == :down ? @direction : :up
+                 when Gosu::KbLeft  then @direction == :right ? @direction : :left
+                 when Gosu::KbDown  then @direction == :up ? @direction : :down
+                 else @direction
+                 end
   end
 end
 
@@ -191,8 +196,8 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def update
-    @rabbit.update
     @snake.update
+    @rabbit.update
 
     if @snake.pos == @rabbit.pos
       @snake.grow
