@@ -74,20 +74,13 @@ class Map
 end
 
 class Rabbit
-  attr_reader :color, :pos
-  def initialize(map_width, map_height)
-    @map_width = map_width
-    @map_height = map_height
+  attr_reader :color
+  attr_accessor :pos
+  def initialize
     @color = Gosu::Color::WHITE
     @hop_direction = :right
     @hop_default = 1
     @hop_distance = @hop_default
-
-    breed
-  end
-
-  def breed
-    @pos = [rand(@map_width + 1), rand(@map_height + 1)]
   end
 
   def update
@@ -190,20 +183,29 @@ class MambaSnakeGame < Gosu::Window
 
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    @rabbit = Rabbit.new(MAP_WIDTH, MAP_HEIGHT)
+    new_rabbit
     @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT)
+  end
+
+  def new_rabbit
+    @rabbit = Rabbit.new
+    @rabbit.pos = [rand(MAP_WIDTH + 1), rand(MAP_HEIGHT + 1)]
+  end
+
+  def update_rabbit
+    @rabbit.update
   end
 
   def update
     return if @paused
 
     @snake.update
-    @rabbit.update
+    update_rabbit
 
     if @snake.pos == @rabbit.pos
       @snake.grow
       while @snake.parts.index(@rabbit.pos)
-        @rabbit.breed
+        new_rabbit
       end
     end
   end
