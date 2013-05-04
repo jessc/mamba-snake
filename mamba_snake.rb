@@ -76,11 +76,12 @@ end
 class Rabbit
   attr_reader :color
   attr_accessor :pos
-  def initialize
+  def initialize(x, y)
     @color = Gosu::Color::WHITE
     @hop_direction = :right
     @hop_default = 1
     @hop_distance = @hop_default
+    @pos = [x, y]
   end
 
   def update
@@ -168,7 +169,7 @@ class MambaSnakeGame < Gosu::Window
   SCREEN_HEIGHT = settings["screen_height"]
 
   TITLE = "Hungry Mamba!"
-  TOP_COLOR = Gosu::Color::YELLOW
+  TOP_COLOR = Gosu::Color::GREEN
   BOTTOM_COLOR = Gosu::Color::GREEN
   TEXT_COLOR = Gosu::Color::BLACK
 
@@ -183,13 +184,12 @@ class MambaSnakeGame < Gosu::Window
 
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    new_rabbit
     @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT)
+    new_rabbit
   end
 
   def new_rabbit
-    @rabbit = Rabbit.new
-    @rabbit.pos = [rand(MAP_WIDTH + 1), rand(MAP_HEIGHT + 1)]
+    @rabbit = Rabbit.new(rand(MAP_WIDTH + 1), rand(MAP_HEIGHT + 1))
   end
 
   def update_rabbit
