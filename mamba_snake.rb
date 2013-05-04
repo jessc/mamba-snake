@@ -80,7 +80,8 @@ class Rabbit
     @map_height = map_height
     @color = Gosu::Color::WHITE
     @hop_direction = :right
-    @hop_distance = 2
+    @hop_default = 1
+    @hop_distance = @hop_default
 
     breed
   end
@@ -107,7 +108,7 @@ class Rabbit
                   end
       @hop_distance -= 1
     else
-      @hop_distance = 2
+      @hop_distance = @hop_default
       @hop_direction = [:left, :right, :up, :down].sample
     end
   end
@@ -119,11 +120,12 @@ class Mamba
   def initialize(map_width, map_height)
     @color = Gosu::Color::BLACK
     @direction = :right
+    @grow_length = 5
+    @start_size = 5
 
     @parts = []
-    (1..5).each { |n| @parts << [(map_width / 2) - n, map_height / 2] }
+    (0..@start_size).each { @parts << [(map_width / 2) - 1, (map_height / 2)] }
     @pos = @parts.shift
-    p @pos
   end
 
   def update
@@ -139,17 +141,13 @@ class Mamba
                 else 0
                 end
 
-    # pushes new head on start of snake, pops end
     @parts.unshift [@pos[0], @pos[1]]
     @parts.pop
-    p @parts
+    # p @parts
   end
 
   def grow
-    # pushes current spot on end of snake
-    # Because the snake will have the same x, y coordinates multiple times,
-    # it will not properly collide with itself.
-    5.times { @parts << @pos }
+    @grow_length.times { @parts << @pos }
   end
 
   def direction(id)
