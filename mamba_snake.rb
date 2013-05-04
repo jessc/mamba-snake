@@ -118,12 +118,12 @@ end
 
 class Mamba
   attr_reader :color, :pos, :parts, :direction
-  def initialize(map_height)
+  def initialize(map_width, map_height)
     @color = Gosu::Color::BLACK
     @direction = :right
 
     @parts = []
-    (10..15).each { |n| @parts << [n, map_height / 2] }
+    (10..15).each { |n| @parts << [map_width / 2, map_height / 2] }
     @pos = parts.shift
   end
 
@@ -187,7 +187,7 @@ class MambaSnakeGame < Gosu::Window
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     @rabbit = Rabbit.new(MAP_WIDTH, MAP_HEIGHT)
-    @snake = Mamba.new(MAP_HEIGHT)
+    @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT)
   end
 
   def update
