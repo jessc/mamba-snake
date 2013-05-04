@@ -84,11 +84,10 @@ class Rabbit
     @pos = [x, y]
   end
 
-  def update
-    hop
-  end
 
-  def hop
+# return a new position based on distance already travelled
+# if it's empty
+  def update
     if @hop_distance > 0
       @pos[0] += case @hop_direction
                   when :left  then -1
@@ -199,7 +198,9 @@ class MambaSnakeGame < Gosu::Window
   def update
     return if @paused
 
-    @snake.update
+    @map[*@snake.update] = :empty
+    @snake.parts.each { |x, y| @map[x, y] = :snake }
+
     update_rabbit
 
     if @snake.pos == @rabbit.pos
