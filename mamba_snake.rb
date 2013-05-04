@@ -19,7 +19,6 @@
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
 - snake does not die when it collides with itself
-- border needs to be a different color
 
 Other Features:
 - allow for multiple rabbits
@@ -154,7 +153,7 @@ end
 
 class MambaSnakeGame < Gosu::Window
   module Z
-    Background, Map, Text, Snake, Rabbit = *1..100
+    Border, Background, Map, Text, Snake, Rabbit = *1..100
   end
 
   settings = YAML.load_file "config.yaml"
@@ -168,6 +167,7 @@ class MambaSnakeGame < Gosu::Window
   TOP_COLOR = Gosu::Color::GREEN
   BOTTOM_COLOR = Gosu::Color::GREEN
   TEXT_COLOR = Gosu::Color::BLACK
+  BORDER_COLOR = Gosu::Color::RED
 
   @paused = false
 
@@ -218,18 +218,26 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw
+    draw_border
     draw_background
     draw_animal(@rabbit.pos, @rabbit.color, Z::Rabbit)
     @snake.parts.each { |part| draw_animal(part, @snake.color, Z::Snake) }
   end
 
+  def draw_border
+    draw_quad(0, 0, BORDER_COLOR,
+              SCREEN_WIDTH, 0, BORDER_COLOR,
+              0, SCREEN_HEIGHT, BORDER_COLOR,
+              SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_COLOR,
+              Z::Border)
+  end
+
   def draw_background
-    draw_quad(
-      0,     0,      TOP_COLOR,
-      SCREEN_WIDTH, 0,      TOP_COLOR,
-      0,     SCREEN_HEIGHT, BOTTOM_COLOR,
-      SCREEN_WIDTH, SCREEN_HEIGHT, BOTTOM_COLOR,
-      Z::Background)
+    draw_quad(10,     10,      TOP_COLOR,
+              SCREEN_WIDTH - 10, 10,      TOP_COLOR,
+              10,     SCREEN_HEIGHT - 10, BOTTOM_COLOR,
+              SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, BOTTOM_COLOR,
+              Z::Background)
   end
 
   def draw_animal(place, color, layer)
