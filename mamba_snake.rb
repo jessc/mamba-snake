@@ -1,52 +1,54 @@
 #!/usr/bin/env ruby
 
-# 2013-04
+# 2013-05
 # Jesse Cummins
 # https://github.com/jessc
+# with advice from Ryan Metzler
 
 =begin
 # Bug List / TODO:
 
+- So here's what I'm thinking: The map can keep track of the animals, but the game asks the animal for a new position,
+  checks if it's OK with map, then sets map equal to it if so
+
+- just keep throwing yourself at the problem!
+- rabbit can leave the map
 - top level game should control the map and snake and rabbits
 - when the game starts the snake does not immediately move
-- if rabbit walled in by snake
-  (is stagnant one step then turns and goes different direction)
-- rabbit can hop two spaces, but not over the snake
+- if rabbit walled in by snake turns and goes different direction
 - sometimes the snake does not eat the rabbit
 - the rabbit can be on top of the snake
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
-- snake does not die when it touches the wall or itself
-- rabbit can leave the map
-- game cannot be paused
+- snake does not die when it collides with wall or itself
+
+
+Other Features:
 - allow for multiple rabbits
-- allow rabbits to breed when near each other
 - add highscore
 - multiplayer game
 - play against a snake AI
+- rabbits can breed when near each other, grow old and die
+- could go up trees to go to a new level
+- snake could move diagonally
+- rabbits could exhibit swarm behavior
+
 =end
 
 require 'gosu'
 require 'yaml'
 
-class Timer
-end
-
 class Map
   attr_reader :width, :height
 
   def initialize(width, height)
-    @empty_char = "."
-    @border_char = "#"
-
-    @map = Hash.new(@empty_char)
+    @map = Hash.new(:empty)
     @width = width
     @height = height
 
-
-    (0...@width).each do |x|
-      (0...@height).each do |y|
-        @map[[x, y]] = @border_char if is_border(x, y)
+    (0...@height).each do |y|
+      (0...@width).each do |x|
+        @map[[x, y]] = :border if is_border(x, y)
       end
     end
   end
@@ -56,11 +58,11 @@ class Map
   end
 
   def display
-    (0...@width).each do |x|
-      (0...@height).each do |y|
-        print @map[[x, y]]
+    (0...@height).each do |y|
+      (0...@width).each do |x|
+        print @map[[x, y]].to_s[0]
       end
-      puts
+      p ''
     end
   end
 end
@@ -220,6 +222,7 @@ class MambaSnakeGame < Gosu::Window
       when Gosu::KbSpace  then @paused = !@paused
       when Gosu::KbEscape then close
       when Gosu::KbR then new_game
+      when Gosu::KbE then @map.display
     end
 
     if button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ) then close; end
