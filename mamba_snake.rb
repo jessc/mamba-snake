@@ -18,8 +18,8 @@
 - if rabbit walled in by snake, rabbit turns and goes different direction
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
-- snake does not die when it collides with wall or itself
-
+- snake does not die when it collides with itself
+- border needs to be a different color
 
 Other Features:
 - allow for multiple rabbits
@@ -181,6 +181,7 @@ class MambaSnakeGame < Gosu::Window
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT)
+    update_snake
     new_rabbit
   end
 
@@ -194,7 +195,7 @@ class MambaSnakeGame < Gosu::Window
 
   def update_snake
     @map[*@snake.update] = :empty
-    @snake.parts.each { |x, y| @map[x, y] = :snake }
+    @snake.parts[1..-1].each { |x, y| @map[x, y] = :snake }
   end
 
   def update
@@ -203,6 +204,11 @@ class MambaSnakeGame < Gosu::Window
     update_snake
     update_rabbit
 
+    if (@map[*@snake.pos] == :border)
+      @paused = true
+      new_game
+    end
+    
     if @snake.pos == @rabbit.pos
       @snake.grow
       while @snake.parts.index(@rabbit.pos)
