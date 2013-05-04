@@ -121,10 +121,9 @@ class Mamba
     @direction = :right
 
     @parts = []
-    # Doing it this way will cause a bug where the snake
-    # won't collide with itself properly.
-    (10..15).each { @parts << [map_width / 2, map_height / 2] }
-    @pos = parts.shift
+    (1..5).each { |n| @parts << [(map_width / 2) - n, map_height / 2] }
+    @pos = @parts.shift
+    p @pos
   end
 
   def update
@@ -143,6 +142,7 @@ class Mamba
     # pushes new head on start of snake, pops end
     @parts.unshift [@pos[0], @pos[1]]
     @parts.pop
+    p @parts
   end
 
   def grow
@@ -150,7 +150,6 @@ class Mamba
     # Because the snake will have the same x, y coordinates multiple times,
     # it will not properly collide with itself.
     5.times { @parts << @pos }
-    p @parts
   end
 
   def direction(id)
@@ -182,6 +181,8 @@ class MambaSnakeGame < Gosu::Window
   BOTTOM_COLOR = Gosu::Color::GREEN
   TEXT_COLOR = Gosu::Color::BLACK
 
+  @paused = false
+
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 100)
     @font = Gosu::Font.new(self, Gosu.default_font_name, 50)
@@ -196,6 +197,8 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def update
+    return if @paused
+
     @snake.update
     @rabbit.update
 
