@@ -65,6 +65,14 @@ class Map
       p ''
     end
   end
+
+  def [](x, y)
+    @map[[x, y]]
+  end
+
+  def []=(x, y, val)
+    @map[[x, y]] = val
+  end
 end
 
 class Rabbit
@@ -79,7 +87,7 @@ class Rabbit
   end
 
   def breed
-    @pos = {:x => rand(@map.width + 1), :y => rand(@map.height + 1)}
+    @pos = [rand(@map.width + 1), rand(@map.height + 1)]
   end
 
   def update
@@ -88,12 +96,12 @@ class Rabbit
 
   def hop
     if @hop_distance > 0
-      @pos[:x] += case @hop_direction
+      @pos[0] += case @hop_direction
                   when :left  then -1
                   when :right then 1
                   else 0
                   end
-      @pos[:y] += case @hop_direction
+      @pos[1] += case @hop_direction
                   when :up   then -1
                   when :down then 1
                   else 0
@@ -109,13 +117,12 @@ end
 
 class Mamba
   attr_reader :color, :pos, :parts, :direction
-  def initialize(map)
+  def initialize(map_height)
     @color = Gosu::Color::BLACK
-    @map = map
     @direction = :right
 
     @parts = []
-    (10..15).each { |n| @parts << {:x => n, :y => @map.height / 2} }
+    (10..15).each { |n| @parts << [n, map_height / 2] }
     @pos = parts.shift
   end
 
@@ -130,19 +137,19 @@ class Mamba
   end
 
   def update
-    @pos[:x] += case @direction
+    @pos[0] += case @direction
                 when :left  then -1
                 when :right then 1
                 else 0
                 end
 
-    @pos[:y] += case @direction
+    @pos[1] += case @direction
                 when :up   then -1
                 when :down then 1
                 else 0
                 end
 
-    @parts << {:x => @pos[:x], :y => @pos[:y]}
+    @parts << [@pos[0], @pos[1]]
     @parts.shift
   end
 
@@ -179,7 +186,7 @@ class MambaSnakeGame < Gosu::Window
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     @rabbit = Rabbit.new(@map)
-    @snake = Mamba.new(@map)
+    @snake = Mamba.new(MAP_HEIGHT)
   end
 
   def update
@@ -210,10 +217,10 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_animal(place, color, layer)
-    draw_quad(place[:x]*10, place[:y]*10, color,
-              place[:x]*10+10, place[:y]*10, color,
-              place[:x]*10, place[:y]*10+10, color,
-              place[:x]*10+10, place[:y]*10+10, color,
+    draw_quad(place[0]*10, place[1]*10, color,
+              place[0]*10+10, place[1]*10, color,
+              place[0]*10, place[1]*10+10, color,
+              place[0]*10+10, place[1]*10+10, color,
               layer)
   end
 
