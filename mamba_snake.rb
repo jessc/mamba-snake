@@ -8,16 +8,16 @@
 =begin
 # Bug List / TODO:
 
-- So here's what I'm thinking: The map can keep track of the animals, but the game asks the animal for a new position,
+- So here's what I'm thinking: The map can keep track of the animals,
+  but the game asks the animal for a new position,
   checks if it's OK with map, then sets map equal to it if so
 
 - just keep throwing yourself at the problem!
 - rabbit can leave the map
 - top level game should control the map and snake and rabbits
 - when the game starts the snake does not immediately move
-- if rabbit walled in by snake turns and goes different direction
+- if rabbit walled in by snake, rabbit turns and goes different direction
 - sometimes the snake does not eat the rabbit
-- the rabbit can be on top of the snake
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
 - snake does not die when it collides with wall or itself
@@ -77,8 +77,9 @@ end
 
 class Rabbit
   attr_reader :color, :pos
-  def initialize(map)
-    @map = map
+  def initialize(map_width, map_height)
+    @map_width = map_width
+    @map_height = map_height
     @color = Gosu::Color::WHITE
     @hop_direction = :right
     @hop_distance = 2
@@ -87,7 +88,7 @@ class Rabbit
   end
 
   def breed
-    @pos = [rand(@map.width + 1), rand(@map.height + 1)]
+    @pos = [rand(@map_width + 1), rand(@map_height + 1)]
   end
 
   def update
@@ -185,7 +186,7 @@ class MambaSnakeGame < Gosu::Window
 
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    @rabbit = Rabbit.new(@map)
+    @rabbit = Rabbit.new(MAP_WIDTH, MAP_HEIGHT)
     @snake = Mamba.new(MAP_HEIGHT)
   end
 
