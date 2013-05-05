@@ -15,14 +15,17 @@
 - just keep throwing yourself at the problem!
 - rabbit can leave the map
 - top level game should control the map and snake and rabbits
-- if rabbit walled in by snake, rabbit turns and goes different direction
+- if rabbit walled in by snake, rabbit should turn and go different direction
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
-- snake does not die when it collides with itself
 - when game starts, if a different direction that :right is chosen, 
   snake stretches weirdly (press up right quickly)
+- if direction keys are pressed rapidly the snake can run on top
+  of itself and instantly die
 
 Other Features:
+- add time
+- add instructions at top of border
 - allow for multiple rabbits
 - add highscore
 - multiplayer game
@@ -107,7 +110,7 @@ end
 
 
 class Mamba
-  attr_reader :color, :pos, :parts, :direction
+  attr_reader :color, :head, :parts, :direction
   def initialize(map_width, map_height)
     @color = Gosu::Color::BLACK
     @direction = :right
@@ -116,30 +119,29 @@ class Mamba
 
     @parts = []
     (0..@start_size).each { |n| @parts << [(map_width / 2) - n, (map_height / 2)] }
-    @pos = @parts.pop
-    # p @pos
+    @head = @parts.pop
+    # p @head
   end
 
   def update
     # p @parts
-    @pos[0] += case @direction
+    @head[0] += case @direction
                 when :left  then -1
                 when :right then 1
                 else 0
                 end
-
-    @pos[1] += case @direction
+    @head[1] += case @direction
                 when :up   then -1
                 when :down then 1
                 else 0
                 end
 
-    @parts.unshift [@pos[0], @pos[1]]
+    @parts.unshift [@head[0], @head[1]]
     @parts.pop
   end
 
   def grow
-    @grow_length.times { @parts << @pos }
+    @grow_length.times { @parts << @parts[-1] }
   end
 
   def direction(id)
@@ -207,12 +209,12 @@ class MambaSnakeGame < Gosu::Window
     update_snake
     update_rabbit
 
-    if (@map[*@snake.pos] == :border)
+    if (@map[*@snake.head] == :border) || (@map[*@snake.head] == :snake)
       @paused = true
       new_game
     end
 
-    if @snake.pos == @rabbit.pos
+    if @snake.head == @rabbit.pos
       @snake.grow
       while @snake.parts.index(@rabbit.pos)
         new_rabbit
