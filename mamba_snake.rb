@@ -8,18 +8,16 @@
 =begin
 # Bug List / TODO:
 
-- So here's what I'm thinking: The map can keep track of the animals,
-  but the game asks the animal for a new position,
-  checks if it's OK with map, then sets map equal to it if so
-
 - Just keep throwing yourself at the problem!
 - sometimes the snake will not eat the rabbit,
   as if the rabbit has jumped away,
   which leads to the rabbit on top of the snake
-- when game starts, if a different direction that :right is chosen, 
+- when game starts, if a different direction that :right is chosen,
   snake stretches weirdly (press up-right quickly)
 - if direction keys are pressed rapidly the snake can run on top
   of itself and instantly die
+- see if you can factor out the case...whens
+- sometimes no rabbit appears when the game starts, perhaps also when it's eaten
 
 Other Features:
 - add time
@@ -32,6 +30,8 @@ Other Features:
 - could go up trees to go to a new level
 - snake could move diagonally
 - rabbits could exhibit swarm behavior
+- speed up snake with key presses or as it gets longer
+
 
 =end
 
@@ -77,34 +77,42 @@ end
 
 class Rabbit
   attr_reader :color
-  attr_accessor :pos, :hop_distance
+  attr_accessor :pos, :distance
   def initialize(x, y)
     @color = Gosu::Color::WHITE
-    @hop_direction = :right
-    @hop_default = 5
-    @hop_distance = @hop_default
+    @dir = :right
+    @default = 5
+    @distance = @default
     @pos = [x, y]
   end
 
+  def dir_x
+    case @dir
+    when :left  then -1
+    when :right then 1
+    else 0
+    end
+  end
+
+  def dir_y
+    case @dir
+    when :up    then -1
+    when :down  then 1
+    else 0
+    end
+  end
+
   def new_direction
-    @hop_direction = [:left, :right, :up, :down].sample
+    @dir = [:left, :right, :up, :down].sample
   end
 
   def next_hop(x, y)
     next_pos = [x, y]
-    if @hop_distance >= 1
-      next_pos[0] += case @hop_direction
-                  when :left  then -1
-                  when :right then 1
-                  else 0
-                  end
-      next_pos[1] += case @hop_direction
-                  when :up   then -1
-                  when :down then 1
-                  else 0
-                  end
+    if @distance >= 1
+      next_pos[0] += dir_x
+      next_pos[1] += dir_y
     else
-      @hop_distance = @hop_default
+      @distance = @default
       new_direction
     end
     next_pos
@@ -113,29 +121,39 @@ end
 
 
 class Mamba
-  attr_reader :color, :head, :parts, :direction
+  attr_reader :color, :head, :parts, :dir
   def initialize(map_width, map_height)
     @color = Gosu::Color::BLACK
-    @direction = :right
+    @dir = :right
     @grow_length = 5
     @start_size = 5
 
     @parts = []
-    (0..@start_size).each { |n| @parts << [(map_width / 2) - n, (map_height / 2)] }
+    (0..@start_size).each do |n|
+      @parts << [(map_width / 2) - n, (map_height / 2)]
+    end
     @head = @parts.pop
   end
 
+  def dir_x
+    case @dir
+    when :left  then -1
+    when :right then 1
+    else 0
+    end
+  end
+
+  def dir_y
+    case @dir
+    when :up    then -1
+    when :down  then 1
+    else 0
+    end
+  end
+
   def update
-    @head[0] += case @direction
-                when :left  then -1
-                when :right then 1
-                else 0
-                end
-    @head[1] += case @direction
-                when :up   then -1
-                when :down then 1
-                else 0
-                end
+    @head[0] += dir_x
+    @head[1] += dir_y
 
     @parts.unshift [@head[0], @head[1]]
     @parts.pop
@@ -146,12 +164,12 @@ class Mamba
   end
 
   def direction(id)
-    @direction = case id
-                 when Gosu::KbRight then @direction == :left ? @direction : :right
-                 when Gosu::KbUp    then @direction == :down ? @direction : :up
-                 when Gosu::KbLeft  then @direction == :right ? @direction : :left
-                 when Gosu::KbDown  then @direction == :up ? @direction : :down
-                 else @direction
+    @dir = case id
+                 when Gosu::KbRight then @dir == :left  ? @dir : :right
+                 when Gosu::KbUp    then @dir == :down  ? @dir : :up
+                 when Gosu::KbLeft  then @dir == :right ? @dir : :left
+                 when Gosu::KbDown  then @dir == :up    ? @dir : :down
+                 else @dir
                  end
   end
 end
@@ -162,14 +180,14 @@ class MambaSnakeGame < Gosu::Window
     Border, Background, Map, Text, Snake, Rabbit = *1..100
   end
 
-  settings = YAML.load_file "config.yaml"
+  settings = YAML.load_file 'config.yaml'
 
-  MAP_WIDTH = settings["map_width"]
-  MAP_HEIGHT = settings["map_height"]
-  SCREEN_WIDTH = settings["screen_width"]
-  SCREEN_HEIGHT = settings["screen_height"]
+  MAP_WIDTH = settings['map_width']
+  MAP_HEIGHT = settings['map_height']
+  SCREEN_WIDTH = settings['screen_width']
+  SCREEN_HEIGHT = settings['screen_height']
 
-  TITLE = "Hungry Mamba!"
+  TITLE = 'Hungry Mamba!'
   TOP_COLOR = Gosu::Color::GREEN
   BOTTOM_COLOR = Gosu::Color::GREEN
   TEXT_COLOR = Gosu::Color::BLACK
@@ -208,27 +226,29 @@ class MambaSnakeGame < Gosu::Window
     else
       @rabbit.new_direction
     end
-    @rabbit.hop_distance -= 1
-    end
+    @rabbit.distance -= 1
+  end
 
   def update_snake
     @map[*@snake.update] = :empty
     @snake.parts[1..-1].each { |x, y| @map[x, y] = :snake }
   end
 
+  def snake_collide?
+    (@map[*@snake.head] == :border) || (@map[*@snake.head] == :snake)
+  end
+
   def update
     return if @paused
 
     update_snake
-
     if @snake.head == @rabbit.pos
       @snake.grow
       new_rabbit
     end
-
     update_rabbit
 
-    if (@map[*@snake.head] == :border) || (@map[*@snake.head] == :snake)
+    if snake_collide?
       @paused = true
       new_game
     end
@@ -258,23 +278,23 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_animal(place, color, layer)
-    draw_quad(place[0]*10, place[1]*10, color,
-              place[0]*10+10, place[1]*10, color,
-              place[0]*10, place[1]*10+10, color,
-              place[0]*10+10, place[1]*10+10, color,
+    draw_quad(place[0] * 10, place[1] * 10, color,
+              place[0] * 10 + 10, place[1] * 10, color,
+              place[0] * 10, place[1] * 10 + 10, color,
+              place[0] * 10 + 10, place[1] * 10 + 10, color,
               layer)
   end
 
   def button_down(id)
     case id
-      when Gosu::KbSpace  then @paused = !@paused
-      when Gosu::KbEscape then close
-      when Gosu::KbR then new_game
-      when Gosu::KbE then @map.display
+    when Gosu::KbSpace  then @paused = !@paused
+    when Gosu::KbEscape then close
+    when Gosu::KbR      then new_game
+    when Gosu::KbE      then @map.display
     end
 
-    if button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ) then close; end
-    if button_down?(Gosu::KbRightMeta) && button_down?(Gosu::KbQ) then close; end
+    close if (button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ))
+    close if (button_down?(Gosu::KbRightMeta) && button_down?(Gosu::KbQ))
 
     @snake.direction(id)
   end
