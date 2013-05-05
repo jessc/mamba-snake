@@ -120,11 +120,9 @@ class Mamba
     @parts = []
     (0..@start_size).each { |n| @parts << [(map_width / 2) - n, (map_height / 2)] }
     @head = @parts.pop
-    # p @head
   end
 
   def update
-    # p @parts
     @head[0] += case @direction
                 when :left  then -1
                 when :right then 1
@@ -191,7 +189,14 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def new_rabbit
-    @rabbit = Rabbit.new(rand(MAP_WIDTH + 1), rand(MAP_HEIGHT + 1))
+    x = rand(MAP_WIDTH + 1)
+    y = rand(MAP_HEIGHT + 1)
+    if @map[x, y] == :empty
+      @map[x, y] = :rabbit
+      @rabbit = Rabbit.new(x, y)
+    else
+      new_rabbit
+    end
   end
 
   def update_rabbit
@@ -215,10 +220,9 @@ class MambaSnakeGame < Gosu::Window
     end
 
     if @snake.head == @rabbit.pos
+      @map[*@rabbit.pos] = :empty
       @snake.grow
-      while @snake.parts.index(@rabbit.pos)
-        new_rabbit
-      end
+      new_rabbit
     end
   end
 
