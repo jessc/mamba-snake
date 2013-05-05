@@ -12,14 +12,12 @@
   but the game asks the animal for a new position,
   checks if it's OK with map, then sets map equal to it if so
 
-- just keep throwing yourself at the problem!
-- rabbit can leave the map
-- top level game should control the map and snake and rabbits
-- if rabbit walled in by snake, rabbit should turn and go different direction
-- sometimes when the rabbit breeds it will start
-  right where the snake is and not appear
+- Just keep throwing yourself at the problem!
+- sometimes the snake will not eat the rabbit,
+  as if the rabbit has jumped away,
+  which leads to the rabbit on top of the snake
 - when game starts, if a different direction that :right is chosen, 
-  snake stretches weirdly (press up right quickly)
+  snake stretches weirdly (press up-right quickly)
 - if direction keys are pressed rapidly the snake can run on top
   of itself and instantly die
 
@@ -79,32 +77,37 @@ end
 
 class Rabbit
   attr_reader :color
-  attr_accessor :pos
+  attr_accessor :pos, :hop_distance
   def initialize(x, y)
     @color = Gosu::Color::WHITE
     @hop_direction = :right
-    @hop_default = 1
+    @hop_default = 5
     @hop_distance = @hop_default
     @pos = [x, y]
   end
 
-  def update
-    if @hop_distance > 0
-      @pos[0] += case @hop_direction
+  def new_direction
+    @hop_direction = [:left, :right, :up, :down].sample
+  end
+
+  def next_hop(x, y)
+    next_pos = [x, y]
+    if @hop_distance >= 1
+      next_pos[0] += case @hop_direction
                   when :left  then -1
                   when :right then 1
                   else 0
                   end
-      @pos[1] += case @hop_direction
+      next_pos[1] += case @hop_direction
                   when :up   then -1
                   when :down then 1
                   else 0
                   end
-      @hop_distance -= 1
     else
       @hop_distance = @hop_default
-      @hop_direction = [:left, :right, :up, :down].sample
+      new_direction
     end
+    next_pos
   end
 end
 
@@ -189,8 +192,7 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def new_rabbit
-    x = rand(MAP_WIDTH + 1)
-    y = rand(MAP_HEIGHT + 1)
+    x, y = rand(MAP_WIDTH + 1), rand(MAP_HEIGHT + 1)
     if @map[x, y] == :empty
       @map[x, y] = :rabbit
       @rabbit = Rabbit.new(x, y)
@@ -200,8 +202,14 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def update_rabbit
-    @rabbit.update
-  end
+    x, y = @rabbit.next_hop(*@rabbit.pos)
+    if @map[x, y] == :empty
+      @rabbit.pos = [x, y]
+    else
+      @rabbit.new_direction
+    end
+    @rabbit.hop_distance -= 1
+    end
 
   def update_snake
     @map[*@snake.update] = :empty
@@ -212,17 +220,17 @@ class MambaSnakeGame < Gosu::Window
     return if @paused
 
     update_snake
+
+    if @snake.head == @rabbit.pos
+      @snake.grow
+      new_rabbit
+    end
+
     update_rabbit
 
     if (@map[*@snake.head] == :border) || (@map[*@snake.head] == :snake)
       @paused = true
       new_game
-    end
-
-    if @snake.head == @rabbit.pos
-      @map[*@rabbit.pos] = :empty
-      @snake.grow
-      new_rabbit
     end
   end
 
