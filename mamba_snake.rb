@@ -9,18 +9,18 @@
 # Bug List / TODO:
 
 - Just keep throwing yourself at the problem!
-- sometimes the snake will not eat the rabbit,
-  as if the rabbit has jumped away,
-  which leads to the rabbit on top of the snake
 - when game starts, if a different direction that :right is chosen,
-  snake stretches weirdly (press up-right quickly)
+    snake stretches weirdly (press up-right quickly)
+    - as if the head is not at the furthest right but is in the middle
+        of the snake
 - if direction keys are pressed rapidly the snake can run on top
-  of itself and instantly die
-- see if you can factor out the case...whens
-- sometimes no rabbit appears when the game starts, perhaps also when it's eaten
+    of itself and instantly dies
+- kind of has a glitchy feel where the snake "jumps" ahead,
+    right before it catches the rabbit
+- rabbit may still be able to respawn on the head of the snake?
 
 Other Features:
-- add time
+- add timer
 - add instructions at top of border
 - allow for multiple rabbits
 - add highscore
@@ -157,6 +157,7 @@ class Mamba
 
     @parts.unshift [@head[0], @head[1]]
     @parts.pop
+
   end
 
   def grow
@@ -210,7 +211,7 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def new_rabbit
-    x, y = rand(MAP_WIDTH + 1), rand(MAP_HEIGHT + 1)
+    x, y = rand(MAP_WIDTH - 1), rand(MAP_HEIGHT - 1)
     if @map[x, y] == :empty
       @map[x, y] = :rabbit
       @rabbit = Rabbit.new(x, y)
@@ -241,11 +242,11 @@ class MambaSnakeGame < Gosu::Window
   def update
     return if @paused
 
-    update_snake
     if @snake.head == @rabbit.pos
       @snake.grow
       new_rabbit
     end
+    update_snake
     update_rabbit
 
     if snake_collide?

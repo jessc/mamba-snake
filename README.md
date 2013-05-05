@@ -23,6 +23,7 @@ A snake-like game with moving rabbits to eat!
 
  - Move: Arrow Keys
  - Pause: Space
+ - Restart: R
  - Quit: Escape or Command+Q
 
 ## Contributing
@@ -38,5 +39,5 @@ A snake-like game with moving rabbits to eat!
 ### Inspiration credits:
  - <https://github.com/mmorin/Snake-2>
  - <https://github.com/ThomasPedersen/rubysnake>
-
+ - Ryan Metzler
 
