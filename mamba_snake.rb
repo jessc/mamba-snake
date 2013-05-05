@@ -19,6 +19,8 @@
 - sometimes when the rabbit breeds it will start
   right where the snake is and not appear
 - snake does not die when it collides with itself
+- when game starts, if a different direction that :right is chosen, 
+  snake stretches weirdly (press up right quickly)
 
 Other Features:
 - allow for multiple rabbits
@@ -113,11 +115,13 @@ class Mamba
     @start_size = 5
 
     @parts = []
-    (0..@start_size).each { @parts << [(map_width / 2) - 1, (map_height / 2)] }
-    @pos = @parts.shift
+    (0..@start_size).each { |n| @parts << [(map_width / 2) - n, (map_height / 2)] }
+    @pos = @parts.pop
+    # p @pos
   end
 
   def update
+    # p @parts
     @pos[0] += case @direction
                 when :left  then -1
                 when :right then 1
@@ -131,7 +135,6 @@ class Mamba
                 end
 
     @parts.unshift [@pos[0], @pos[1]]
-    # p @parts
     @parts.pop
   end
 
@@ -208,7 +211,7 @@ class MambaSnakeGame < Gosu::Window
       @paused = true
       new_game
     end
-    
+
     if @snake.pos == @rabbit.pos
       @snake.grow
       while @snake.parts.index(@rabbit.pos)
