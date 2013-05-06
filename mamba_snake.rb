@@ -187,8 +187,9 @@ class MambaSnakeGame < Gosu::Window
 
   WINDOW_WIDTH = settings['window_width']
   WINDOW_HEIGHT = settings['window_height']
-  MAP_WIDTH = WINDOW_WIDTH / 10
-  MAP_HEIGHT = WINDOW_HEIGHT / 10
+  TILE_WIDTH = 20
+  MAP_WIDTH = WINDOW_WIDTH / TILE_WIDTH
+  MAP_HEIGHT = WINDOW_HEIGHT / TILE_WIDTH
 
   TITLE = 'Hungry Mamba!'
   TOP_COLOR = Gosu::Color::GREEN
@@ -273,18 +274,18 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_background
-    draw_quad(10,     10,      TOP_COLOR,
-              WINDOW_WIDTH - 10, 10,      TOP_COLOR,
-              10,     WINDOW_HEIGHT - 10, BOTTOM_COLOR,
-              WINDOW_WIDTH - 10, WINDOW_HEIGHT - 10, BOTTOM_COLOR,
+    draw_quad(TILE_WIDTH,     TILE_WIDTH,      TOP_COLOR,
+              WINDOW_WIDTH - TILE_WIDTH, TILE_WIDTH,      TOP_COLOR,
+              TILE_WIDTH,     WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
+              WINDOW_WIDTH - TILE_WIDTH, WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
               Z::Background)
   end
 
   def draw_animal(place, color, layer)
-    draw_quad(place[0] * 10, place[1] * 10, color,
-              place[0] * 10 + 10, place[1] * 10, color,
-              place[0] * 10, place[1] * 10 + 10, color,
-              place[0] * 10 + 10, place[1] * 10 + 10, color,
+    draw_quad(place[0] * TILE_WIDTH, place[1] * TILE_WIDTH, color,
+              place[0] * TILE_WIDTH + TILE_WIDTH, place[1] * TILE_WIDTH, color,
+              place[0] * TILE_WIDTH, place[1] * TILE_WIDTH + TILE_WIDTH, color,
+              place[0] * TILE_WIDTH + TILE_WIDTH, place[1] * TILE_WIDTH + TILE_WIDTH, color,
               layer)
   end
 
