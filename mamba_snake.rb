@@ -257,6 +257,7 @@ class MambaSnakeGame < Gosu::Window
   def draw
     draw_border
     draw_background
+    draw_text
     draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
     @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
   end
@@ -275,6 +276,20 @@ class MambaSnakeGame < Gosu::Window
               TILE_WIDTH,     WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
               WINDOW_WIDTH - TILE_WIDTH, WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
               Z::Background)
+  end
+
+  def draw_text
+    # at top
+    "Most Eaten: #most_eaten"
+    "Time: #stopwatch"
+    "#You died!"
+    "Length: #length"
+    "Rabbits Eaten: #rabbits_eaten"
+    # at bottom
+    "Move: Arrow Keys"
+    "Pause / Resume: Space"
+    "Restart: R"
+    "Quit: Escape or Command+Q"
   end
 
   def draw_animal(place, color, layer)
