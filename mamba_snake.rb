@@ -18,10 +18,11 @@
 - kind of has a glitchy feel where the snake "jumps" ahead,
     right before it catches the rabbit
 - rabbit may still be able to respawn on the head of the snake?
+- fix magic numbers wrt window/border pixel number
 
 Other Features:
 - add timer
-- add instructions at top of border
+- add instructions at top of screen
 - allow for multiple rabbits
 - add highscore
 - multiplayer game
@@ -185,8 +186,8 @@ class MambaSnakeGame < Gosu::Window
 
   MAP_WIDTH = settings['map_width']
   MAP_HEIGHT = settings['map_height']
-  SCREEN_WIDTH = settings['screen_width']
-  SCREEN_HEIGHT = settings['screen_height']
+  WINDOW_WIDTH = settings['window_width']
+  WINDOW_HEIGHT = settings['window_height']
 
   TITLE = 'Hungry Mamba!'
   TOP_COLOR = Gosu::Color::GREEN
@@ -197,7 +198,7 @@ class MambaSnakeGame < Gosu::Window
   @paused = false
 
   def initialize
-    super(SCREEN_WIDTH, SCREEN_HEIGHT, false, 100)
+    super(WINDOW_WIDTH, WINDOW_HEIGHT, false, 100)
     @font = Gosu::Font.new(self, Gosu.default_font_name, 50)
     self.caption = TITLE
     new_game
@@ -264,17 +265,17 @@ class MambaSnakeGame < Gosu::Window
 
   def draw_border
     draw_quad(0, 0, BORDER_COLOR,
-              SCREEN_WIDTH, 0, BORDER_COLOR,
-              0, SCREEN_HEIGHT, BORDER_COLOR,
-              SCREEN_WIDTH, SCREEN_HEIGHT, BORDER_COLOR,
+              WINDOW_WIDTH, 0, BORDER_COLOR,
+              0, WINDOW_HEIGHT, BORDER_COLOR,
+              WINDOW_WIDTH, WINDOW_HEIGHT, BORDER_COLOR,
               Z::Border)
   end
 
   def draw_background
     draw_quad(10,     10,      TOP_COLOR,
-              SCREEN_WIDTH - 10, 10,      TOP_COLOR,
-              10,     SCREEN_HEIGHT - 10, BOTTOM_COLOR,
-              SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10, BOTTOM_COLOR,
+              WINDOW_WIDTH - 10, 10,      TOP_COLOR,
+              10,     WINDOW_HEIGHT - 10, BOTTOM_COLOR,
+              WINDOW_WIDTH - 10, WINDOW_HEIGHT - 10, BOTTOM_COLOR,
               Z::Background)
   end
 
