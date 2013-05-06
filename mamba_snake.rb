@@ -115,7 +115,6 @@ end
 
 class Mamba
   attr_reader :head, :body, :dir
-  attr_accessor :status
 
   DIRECTION = { Gosu::KbUp    => [0, -1],
                 Gosu::KbDown  => [0, 1],
@@ -202,6 +201,7 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def new_game
+    @dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
     update_snake
@@ -241,6 +241,7 @@ class MambaSnakeGame < Gosu::Window
 
   def update
     return if @paused
+    @dead = false
 
     if @snake.head == @rabbit.pos
       @snake.grow
@@ -250,6 +251,7 @@ class MambaSnakeGame < Gosu::Window
     update_rabbit
 
     if snake_collide?
+      @dead = true
       @paused = true
       new_game
     end
@@ -260,7 +262,7 @@ class MambaSnakeGame < Gosu::Window
     draw_background
 
     draw_top_text
-    # draw_you_died if @dead # not working for some reason?
+    draw_you_died if @dead
     draw_bottom_text
 
     draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
