@@ -123,14 +123,13 @@ class Mamba
                 Gosu::KbRight => [1, 0] }
 
   def initialize(map_width, map_height, start_size, grow_length)
-    @dir = Gosu::KbRight
+    @dir = Gosu::KbUp
     @start_size = start_size
     @grow_length = grow_length
-    @status = :alive
 
     @body = []
     (0..@start_size).each do |n|
-      @body << [(map_width / 2) - n, (map_height / 2)]
+      @body << [(map_width / 2), (map_height / 2) + n]
     end
     @head = @body.pop
   end
