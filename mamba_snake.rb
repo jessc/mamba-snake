@@ -161,7 +161,7 @@ end
 
 class MambaSnakeGame < Gosu::Window
   module Z
-    Border, Background, Map, Text, Snake, Rabbit = *1..100
+    Border, Background, Text, Snake, Rabbit = *1..100
   end
 
   config = YAML.load_file 'config.yaml'
@@ -259,9 +259,11 @@ class MambaSnakeGame < Gosu::Window
   def draw
     draw_border
     draw_background
+
     draw_top_text
-    draw_you_died if @snake.status == :dead
+    # draw_you_died if @dead # not working for some reason?
     draw_bottom_text
+
     draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
     @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
   end
@@ -275,9 +277,9 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_background
-    draw_quad(TILE_WIDTH,     TILE_WIDTH,      TOP_COLOR,
+    draw_quad(TILE_WIDTH,                TILE_WIDTH,      TOP_COLOR,
               WINDOW_WIDTH - TILE_WIDTH, TILE_WIDTH,      TOP_COLOR,
-              TILE_WIDTH,     WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
+              TILE_WIDTH,                WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
               WINDOW_WIDTH - TILE_WIDTH, WINDOW_HEIGHT - TILE_WIDTH, BOTTOM_COLOR,
               Z::Background)
   end
@@ -290,11 +292,9 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_you_died
-    text = "You died! Press space."
-    text_width = @font.text_width(text)
-    draw_text(text, TILE_WIDTH*11, TILE_WIDTH*5)
+    draw_text("You died! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
   end
-  
+
   def draw_bottom_text
     draw_text("Move: Arrow Keys", TILE_WIDTH, TILE_WIDTH*19)
     draw_text("Un/pause: Space", TILE_WIDTH, TILE_WIDTH*20)
@@ -307,9 +307,9 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_animal(place, color, layer)
-    draw_quad(place[0] * TILE_WIDTH, place[1] * TILE_WIDTH, color,
+    draw_quad(place[0] * TILE_WIDTH,              place[1] * TILE_WIDTH, color,
               place[0] * TILE_WIDTH + TILE_WIDTH, place[1] * TILE_WIDTH, color,
-              place[0] * TILE_WIDTH, place[1] * TILE_WIDTH + TILE_WIDTH, color,
+              place[0] * TILE_WIDTH,              place[1] * TILE_WIDTH + TILE_WIDTH, color,
               place[0] * TILE_WIDTH + TILE_WIDTH, place[1] * TILE_WIDTH + TILE_WIDTH, color,
               layer)
   end
