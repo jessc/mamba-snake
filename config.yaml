@@ -1,3 +1,13 @@
 ---
 "window_width": 640
 "window_height": 480
+"tile_width": 20
+
+# Colors: black, gray, white, aqua, red, green, blue, yellow, fuchsia, cyan
+"map_color": green
+"border_color": red
+"text_color": black
+
+"snake_color": black
+"rabbit_color": white
+"rabbit_jump_distance": 5

@@ -163,19 +163,26 @@ class MambaSnakeGame < Gosu::Window
     Border, Background, Map, Text, Snake, Rabbit = *1..100
   end
 
-  settings = YAML.load_file 'config.yaml'
+  config = YAML.load_file 'config.yaml'
 
-  WINDOW_WIDTH = settings['window_width']
-  WINDOW_HEIGHT = settings['window_height']
-  TILE_WIDTH = 20
+  TITLE = 'Hungry Mamba!'
+
+  WINDOW_WIDTH = config['window_width']
+  WINDOW_HEIGHT = config['window_height']
+  TILE_WIDTH = config['tile_width']
   MAP_WIDTH = WINDOW_WIDTH / TILE_WIDTH
   MAP_HEIGHT = WINDOW_HEIGHT / TILE_WIDTH
 
-  TITLE = 'Hungry Mamba!'
-  TOP_COLOR = Gosu::Color::GREEN
-  BOTTOM_COLOR = Gosu::Color::GREEN
-  TEXT_COLOR = Gosu::Color::BLACK
-  BORDER_COLOR = Gosu::Color::RED
+  color_hash = {BLACK: 0xff000000, GRAY: 0xff808080, WHITE: 0xffffffff,
+                AQUA: 0xff00ffff, RED: 0xffff0000, GREEN: 0xff00ff00,
+                BLUE: 0xff0000ff, YELLOW: 0xffffff00, FUCHSIA: 0xffff00ff,
+                CYAN: 0xff00ffff}
+
+  MAP_COLOR    = config['map_color'].upcase.to_sym
+  TOP_COLOR    = Gosu::Color.argb(color_hash[MAP_COLOR])
+  BOTTOM_COLOR = Gosu::Color.argb(color_hash[MAP_COLOR])
+  TEXT_COLOR   = Gosu::Color.argb(color_hash[config['text_color'].upcase.to_sym])
+  BORDER_COLOR = Gosu::Color.argb(color_hash[config['border_color'].upcase.to_sym])
 
   @paused = false
 
