@@ -194,7 +194,7 @@ class MambaSnakeGame < Gosu::Window
 
   def initialize
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, 100)
-    @font = Gosu::Font.new(self, Gosu.default_font_name, 50)
+    @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     self.caption = TITLE
     new_game
@@ -257,7 +257,8 @@ class MambaSnakeGame < Gosu::Window
   def draw
     draw_border
     draw_background
-    draw_text
+    draw_top_text
+    draw_bottom_text
     draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
     @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
   end
@@ -278,18 +279,23 @@ class MambaSnakeGame < Gosu::Window
               Z::Background)
   end
 
-  def draw_text
-    # at top
-    "Most Eaten: #most_eaten"
-    "Time: #stopwatch"
-    "#You died!"
-    "Length: #length"
-    "Rabbits Eaten: #rabbits_eaten"
-    # at bottom
+  def draw_top_text
+    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH)
+    draw_text("Time: #{@time}", TILE_WIDTH*10, TILE_WIDTH)
+    #"#You died! Press space." if :dead
+    draw_text("Length: #{@length}", TILE_WIDTH*15, TILE_WIDTH)
+    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH*20, TILE_WIDTH)
+  end
+  
+  def draw_bottom_text
     "Move: Arrow Keys"
     "Pause / Resume: Space"
     "Restart: R"
     "Quit: Escape or Command+Q"
+  end
+
+  def draw_text(text, x, y)
+    @font.draw(text, x, y, Z::Text, 1.0, 1.0, TEXT_COLOR)
   end
 
   def draw_animal(place, color, layer)
