@@ -13,8 +13,6 @@
     snake stretches weirdly (press up-right quickly)
     - as if the head is not at the furthest right but is in the middle
         of the snake
-- if direction keys are pressed rapidly the snake can run on top
-    of itself and instantly dies
 - kind of has a glitchy feel where the snake "jumps" ahead,
     right before it catches the rabbit
 - rabbit may still be able to respawn on the head of the snake?
@@ -31,7 +29,7 @@
 - multiplayer game
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
-- could go up trees to go to a new level
+- could go up trees to go to a new level, hunt for birds
 - snake could move diagonally
 - rabbits could exhibit swarm behavior
 - speed up snake with key presses or as it gets longer
@@ -83,11 +81,10 @@ class Rabbit
   attr_reader :color
   attr_accessor :pos, :distance
 
-  DIRECTION = {
-  up:    [0, -1],
-  down:  [0, 1],
-  left:  [-1, 0],
-  right: [1, 0]}
+  DIRECTION = { up:    [0, -1],
+                down:  [0, 1],
+                left:  [-1, 0],
+                right: [1, 0] }
 
   def initialize(x, y)
     @color = Gosu::Color::WHITE
@@ -118,16 +115,15 @@ end
 class Mamba
   attr_reader :color, :head, :body, :dir
 
-  DIRECTION = {
-  up:    [0, -1],
-  down:  [0, 1],
-  left:  [-1, 0],
-  right: [1, 0]}
+  DIRECTION = { Gosu::KbUp    => [0, -1],
+                Gosu::KbDown  => [0, 1],
+                Gosu::KbLeft  => [-1, 0],
+                Gosu::KbRight => [1, 0] }
 
   def initialize(map_width, map_height)
 
     @color = Gosu::Color::BLACK
-    @dir = :right
+    @dir = Gosu::KbRight
     @grow_length = 5
     @start_size = 5
 
@@ -150,14 +146,14 @@ class Mamba
     @grow_length.times { @body << @body[-1] }
   end
 
-  def direction(id)
-    @dir = case id
-                 when Gosu::KbRight then @dir == :left  ? @dir : :right
-                 when Gosu::KbUp    then @dir == :down  ? @dir : :up
-                 when Gosu::KbLeft  then @dir == :right ? @dir : :left
-                 when Gosu::KbDown  then @dir == :up    ? @dir : :down
-                 else @dir
-                 end
+  def button_down(id)
+    if DIRECTION.keys.include?(id)
+      next_head = [@head[0] + DIRECTION[id][0],
+                   @head[1] + DIRECTION[id][1]]
+      unless @body.include?(next_head)
+        @dir = id
+      end
+    end
   end
 end
 
@@ -286,7 +282,7 @@ class MambaSnakeGame < Gosu::Window
     close if (button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ))
     close if (button_down?(Gosu::KbRightMeta) && button_down?(Gosu::KbQ))
 
-    @snake.direction(id)
+    @snake.button_down(id)
   end
 end
 
