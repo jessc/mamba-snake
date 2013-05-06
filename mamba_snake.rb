@@ -20,6 +20,8 @@
     - I think it's because it's taking two steps to replace the white rabbit
         with the black snake
     - it looks like the head is at the end of the snake, rather than the start
+- config snake start pos
+- overlay "You died!\nPress Space to restart." when the game resets
 
 # TODO:
 - add timer
@@ -33,7 +35,7 @@
 - snake could move diagonally
 - rabbits could exhibit swarm behavior
 - speed up snake with key presses or as it gets longer
-
+- snake could have boosts when you press a button to go faster
 
 =end
 
@@ -77,6 +79,7 @@ class Map
   end
 end
 
+
 class Rabbit
   attr_accessor :pos, :distance
 
@@ -85,9 +88,9 @@ class Rabbit
                 left:  [-1, 0],
                 right: [1, 0] }
 
-  def initialize(x, y)
+  def initialize(x, y, distance)
     @dir = :right
-    @default = 5
+    @default = distance
     @distance = @default
     @pos = [x, y]
   end
@@ -118,10 +121,10 @@ class Mamba
                 Gosu::KbLeft  => [-1, 0],
                 Gosu::KbRight => [1, 0] }
 
-  def initialize(map_width, map_height)
+  def initialize(map_width, map_height, start_size, grow_length)
     @dir = Gosu::KbRight
-    @grow_length = 5
-    @start_size = 5
+    @start_size = start_size
+    @grow_length = grow_length
 
     @body = []
     (0..@start_size).each do |n|
@@ -169,30 +172,37 @@ class MambaSnakeGame < Gosu::Window
   MAP_WIDTH = WINDOW_WIDTH / TILE_WIDTH
   MAP_HEIGHT = WINDOW_HEIGHT / TILE_WIDTH
 
-  colors = {BLACK: 0xff000000, GRAY: 0xff808080, WHITE: 0xffffffff,
+  COLORS = {BLACK: 0xff000000, GRAY: 0xff808080, WHITE: 0xffffffff,
             AQUA: 0xff00ffff, RED: 0xffff0000, GREEN: 0xff00ff00,
             BLUE: 0xff0000ff, YELLOW: 0xffffff00, FUCHSIA: 0xffff00ff,
             CYAN: 0xff00ffff}
 
-  TOP_COLOR    = Gosu::Color.argb(colors[config['map_color'].upcase.to_sym])
-  BOTTOM_COLOR = Gosu::Color.argb(colors[config['map_color'].upcase.to_sym])
-  TEXT_COLOR   = Gosu::Color.argb(colors[config['text_color'].upcase.to_sym])
-  BORDER_COLOR = Gosu::Color.argb(colors[config['border_color'].upcase.to_sym])
-  SNAKE_COLOR  = Gosu::Color.argb(colors[config['snake_color'].upcase.to_sym])
-  RABBIT_COLOR = Gosu::Color.argb(colors[config['rabbit_color'].upcase.to_sym])
+  find_color = ->(color) { COLORS[config[color].upcase.to_sym] }
+  set_color = -> (color) { Gosu::Color.argb(color) }
 
-  @paused = false
+  TOP_COLOR    = set_color.(find_color.('map_color'))
+  BOTTOM_COLOR = set_color.(find_color.('map_color'))
+  TEXT_COLOR   = set_color.(find_color.('text_color'))
+  BORDER_COLOR = set_color.(find_color.('border_color'))
+  SNAKE_COLOR  = set_color.(find_color.('snake_color'))
+  RABBIT_COLOR = set_color.(find_color.('rabbit_color'))
+
+  SNAKE_START_SIZE = config['snake_start_size']
+  SNAKE_GROW_LENGTH = config['snake_grow_length']
+
+  RABBIT_HOP_DISTANCE = config['rabbit_hop_distance']
 
   def initialize
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, 100)
     @font = Gosu::Font.new(self, Gosu.default_font_name, 50)
+    @paused = false
     self.caption = TITLE
     new_game
   end
 
   def new_game
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT)
+    @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
     update_snake
     new_rabbit
   end
@@ -201,7 +211,7 @@ class MambaSnakeGame < Gosu::Window
     x, y = rand(MAP_WIDTH - 1), rand(MAP_HEIGHT - 1)
     if @map[x, y] == :empty
       @map[x, y] = :rabbit
-      @rabbit = Rabbit.new(x, y)
+      @rabbit = Rabbit.new(x, y, RABBIT_HOP_DISTANCE)
     else
       new_rabbit
     end
