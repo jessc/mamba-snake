@@ -115,6 +115,7 @@ end
 
 class Mamba
   attr_reader :head, :body, :dir
+  attr_accessor :status
 
   DIRECTION = { Gosu::KbUp    => [0, -1],
                 Gosu::KbDown  => [0, 1],
@@ -125,6 +126,7 @@ class Mamba
     @dir = Gosu::KbRight
     @start_size = start_size
     @grow_length = grow_length
+    @status = :alive
 
     @body = []
     (0..@start_size).each do |n|
@@ -258,6 +260,7 @@ class MambaSnakeGame < Gosu::Window
     draw_border
     draw_background
     draw_top_text
+    draw_you_died if @snake.status == :dead
     draw_bottom_text
     draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
     @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
@@ -280,18 +283,23 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_top_text
-    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH)
-    draw_text("Time: #{@time}", TILE_WIDTH*10, TILE_WIDTH)
-    #"#You died! Press space." if :dead
-    draw_text("Length: #{@length}", TILE_WIDTH*15, TILE_WIDTH)
-    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH*20, TILE_WIDTH)
+    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*1)
+    draw_text("Time: #{@time}", TILE_WIDTH, TILE_WIDTH*2)
+    draw_text("Length: #{@length}", TILE_WIDTH, TILE_WIDTH*3)
+    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*4)
+  end
+
+  def draw_you_died
+    text = "You died! Press space."
+    text_width = @font.text_width(text)
+    draw_text(text, TILE_WIDTH*11, TILE_WIDTH*5)
   end
   
   def draw_bottom_text
-    "Move: Arrow Keys"
-    "Pause / Resume: Space"
-    "Restart: R"
-    "Quit: Escape or Command+Q"
+    draw_text("Move: Arrow Keys", TILE_WIDTH, TILE_WIDTH*19)
+    draw_text("Un/pause: Space", TILE_WIDTH, TILE_WIDTH*20)
+    draw_text("Restart: R", TILE_WIDTH, TILE_WIDTH*21)
+    draw_text("Quit: Escape or Command+Q", TILE_WIDTH, TILE_WIDTH*22)
   end
 
   def draw_text(text, x, y)
