@@ -18,8 +18,10 @@
 - kind of has a glitchy feel where the snake "jumps" ahead,
     right before it catches the rabbit
 - rabbit may still be able to respawn on the head of the snake?
-- fix magic numbers wrt window/border pixel number
 - snake doesn't immediately start moving at beginning of game
+    - I think it's because it's taking two steps to replace the white rabbit
+        with the black snake
+    - it looks like the head is at the end of the snake, rather than the start
 
 # TODO:
 - add timer
@@ -80,28 +82,19 @@ end
 class Rabbit
   attr_reader :color
   attr_accessor :pos, :distance
+
+  DIRECTION = {
+  up:    [0, -1],
+  down:  [0, 1],
+  left:  [-1, 0],
+  right: [1, 0]}
+
   def initialize(x, y)
     @color = Gosu::Color::WHITE
     @dir = :right
     @default = 5
     @distance = @default
     @pos = [x, y]
-  end
-
-  def dir_x
-    case @dir
-    when :left  then -1
-    when :right then 1
-    else 0
-    end
-  end
-
-  def dir_y
-    case @dir
-    when :up    then -1
-    when :down  then 1
-    else 0
-    end
   end
 
   def new_direction
@@ -111,8 +104,8 @@ class Rabbit
   def next_hop(x, y)
     next_pos = [x, y]
     if @distance >= 1
-      next_pos[0] += dir_x
-      next_pos[1] += dir_y
+      next_pos[0] += DIRECTION[@dir][0]
+      next_pos[1] += DIRECTION[@dir][1]
     else
       @distance = @default
       new_direction
@@ -123,47 +116,38 @@ end
 
 
 class Mamba
-  attr_reader :color, :head, :parts, :dir
+  attr_reader :color, :head, :body, :dir
+
+  DIRECTION = {
+  up:    [0, -1],
+  down:  [0, 1],
+  left:  [-1, 0],
+  right: [1, 0]}
+
   def initialize(map_width, map_height)
+
     @color = Gosu::Color::BLACK
     @dir = :right
     @grow_length = 5
     @start_size = 5
 
-    @parts = []
+    @body = []
     (0..@start_size).each do |n|
-      @parts << [(map_width / 2) - n, (map_height / 2)]
+      @body << [(map_width / 2) - n, (map_height / 2)]
     end
-    @head = @parts.pop
-  end
-
-  def dir_x
-    case @dir
-    when :left  then -1
-    when :right then 1
-    else 0
-    end
-  end
-
-  def dir_y
-    case @dir
-    when :up    then -1
-    when :down  then 1
-    else 0
-    end
+    @head = @body.pop
   end
 
   def update
-    @head[0] += dir_x
-    @head[1] += dir_y
+    @head[0] += DIRECTION[@dir][0]
+    @head[1] += DIRECTION[@dir][1]
 
-    @parts.unshift [@head[0], @head[1]]
-    @parts.pop
-
+    @body.unshift [@head[0], @head[1]]
+    @body.pop
   end
 
   def grow
-    @grow_length.times { @parts << @parts[-1] }
+    @grow_length.times { @body << @body[-1] }
   end
 
   def direction(id)
@@ -235,7 +219,9 @@ class MambaSnakeGame < Gosu::Window
 
   def update_snake
     @map[*@snake.update] = :empty
-    @snake.parts[1..-1].each { |x, y| @map[x, y] = :snake }
+    @snake.body[1..-1].each { |x, y| @map[x, y] = :snake }
+    # obviously the head should be :snake, but how to get it to work?
+    # maybe if there is a next_head?
   end
 
   def snake_collide?
@@ -262,7 +248,7 @@ class MambaSnakeGame < Gosu::Window
     draw_border
     draw_background
     draw_animal(@rabbit.pos, @rabbit.color, Z::Rabbit)
-    @snake.parts.each { |part| draw_animal(part, @snake.color, Z::Snake) }
+    @snake.body.each { |part| draw_animal(part, @snake.color, Z::Snake) }
   end
 
   def draw_border
