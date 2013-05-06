@@ -6,7 +6,7 @@
 # with advice from Ryan Metzler
 
 =begin
-# Bug List / TODO:
+# Bug List:
 
 - Just keep throwing yourself at the problem!
 - when game starts, if a different direction that :right is chosen,
@@ -19,8 +19,9 @@
     right before it catches the rabbit
 - rabbit may still be able to respawn on the head of the snake?
 - fix magic numbers wrt window/border pixel number
+- snake doesn't immediately start moving at beginning of game
 
-Other Features:
+# TODO:
 - add timer
 - add instructions at top of screen
 - allow for multiple rabbits
@@ -184,10 +185,10 @@ class MambaSnakeGame < Gosu::Window
 
   settings = YAML.load_file 'config.yaml'
 
-  MAP_WIDTH = settings['map_width']
-  MAP_HEIGHT = settings['map_height']
   WINDOW_WIDTH = settings['window_width']
   WINDOW_HEIGHT = settings['window_height']
+  MAP_WIDTH = WINDOW_WIDTH / 10
+  MAP_HEIGHT = WINDOW_HEIGHT / 10
 
   TITLE = 'Hungry Mamba!'
   TOP_COLOR = Gosu::Color::GREEN
