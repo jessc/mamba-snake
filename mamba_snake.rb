@@ -78,7 +78,6 @@ class Map
 end
 
 class Rabbit
-  attr_reader :color
   attr_accessor :pos, :distance
 
   DIRECTION = { up:    [0, -1],
@@ -87,7 +86,6 @@ class Rabbit
                 right: [1, 0] }
 
   def initialize(x, y)
-    @color = Gosu::Color::WHITE
     @dir = :right
     @default = 5
     @distance = @default
@@ -113,7 +111,7 @@ end
 
 
 class Mamba
-  attr_reader :color, :head, :body, :dir
+  attr_reader :head, :body, :dir
 
   DIRECTION = { Gosu::KbUp    => [0, -1],
                 Gosu::KbDown  => [0, 1],
@@ -121,8 +119,6 @@ class Mamba
                 Gosu::KbRight => [1, 0] }
 
   def initialize(map_width, map_height)
-
-    @color = Gosu::Color::BLACK
     @dir = Gosu::KbRight
     @grow_length = 5
     @start_size = 5
@@ -173,16 +169,17 @@ class MambaSnakeGame < Gosu::Window
   MAP_WIDTH = WINDOW_WIDTH / TILE_WIDTH
   MAP_HEIGHT = WINDOW_HEIGHT / TILE_WIDTH
 
-  color_hash = {BLACK: 0xff000000, GRAY: 0xff808080, WHITE: 0xffffffff,
-                AQUA: 0xff00ffff, RED: 0xffff0000, GREEN: 0xff00ff00,
-                BLUE: 0xff0000ff, YELLOW: 0xffffff00, FUCHSIA: 0xffff00ff,
-                CYAN: 0xff00ffff}
+  colors = {BLACK: 0xff000000, GRAY: 0xff808080, WHITE: 0xffffffff,
+            AQUA: 0xff00ffff, RED: 0xffff0000, GREEN: 0xff00ff00,
+            BLUE: 0xff0000ff, YELLOW: 0xffffff00, FUCHSIA: 0xffff00ff,
+            CYAN: 0xff00ffff}
 
-  MAP_COLOR    = config['map_color'].upcase.to_sym
-  TOP_COLOR    = Gosu::Color.argb(color_hash[MAP_COLOR])
-  BOTTOM_COLOR = Gosu::Color.argb(color_hash[MAP_COLOR])
-  TEXT_COLOR   = Gosu::Color.argb(color_hash[config['text_color'].upcase.to_sym])
-  BORDER_COLOR = Gosu::Color.argb(color_hash[config['border_color'].upcase.to_sym])
+  TOP_COLOR    = Gosu::Color.argb(colors[config['map_color'].upcase.to_sym])
+  BOTTOM_COLOR = Gosu::Color.argb(colors[config['map_color'].upcase.to_sym])
+  TEXT_COLOR   = Gosu::Color.argb(colors[config['text_color'].upcase.to_sym])
+  BORDER_COLOR = Gosu::Color.argb(colors[config['border_color'].upcase.to_sym])
+  SNAKE_COLOR  = Gosu::Color.argb(colors[config['snake_color'].upcase.to_sym])
+  RABBIT_COLOR = Gosu::Color.argb(colors[config['rabbit_color'].upcase.to_sym])
 
   @paused = false
 
@@ -250,8 +247,8 @@ class MambaSnakeGame < Gosu::Window
   def draw
     draw_border
     draw_background
-    draw_animal(@rabbit.pos, @rabbit.color, Z::Rabbit)
-    @snake.body.each { |part| draw_animal(part, @snake.color, Z::Snake) }
+    draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
+    @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
   end
 
   def draw_border
