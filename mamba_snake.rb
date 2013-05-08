@@ -160,7 +160,6 @@ class MambaSnakeGame < Gosu::Window
   config = YAML.load_file 'config.yaml'
 
   TITLE = 'Hungry Mamba!'
-
   WINDOW_WIDTH = config['window_width']
   WINDOW_HEIGHT = config['window_height']
   TILE_WIDTH = config['tile_width']
@@ -173,7 +172,7 @@ class MambaSnakeGame < Gosu::Window
             CYAN: 0xff00ffff}
 
   find_color = ->(color) { COLORS[config[color].upcase.to_sym] }
-  set_color = -> (color) { Gosu::Color.argb(color) }
+  set_color  = ->(color) { Gosu::Color.argb(color) }
 
   TOP_COLOR    = set_color.(find_color.('map_color'))
   BOTTOM_COLOR = set_color.(find_color.('map_color'))
@@ -181,14 +180,13 @@ class MambaSnakeGame < Gosu::Window
   BORDER_COLOR = set_color.(find_color.('border_color'))
   SNAKE_COLOR  = set_color.(find_color.('snake_color'))
   RABBIT_COLOR = set_color.(find_color.('rabbit_color'))
-
   SNAKE_START_SIZE = config['snake_start_size']
   SNAKE_GROW_LENGTH = config['snake_grow_length']
-
   RABBIT_HOP_DISTANCE = config['rabbit_hop_distance']
+  GAME_SPEED = config['game_speed']
 
   def initialize
-    super(WINDOW_WIDTH, WINDOW_HEIGHT, false, 100)
+    super(WINDOW_WIDTH, WINDOW_HEIGHT, false, GAME_SPEED)
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     self.caption = TITLE

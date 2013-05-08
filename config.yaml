@@ -3,6 +3,8 @@
 "window_height": 480
 "tile_width": 20
 
+"game_speed": 100
+
 # Colors: black, gray, white, aqua, red,
 #         green, blue, yellow, fuchsia, cyan
 "map_color": green
