@@ -23,8 +23,8 @@
 
 =end
 
-require 'gosu'
-require 'yaml'
+require 'gosu' 
+require 'yaml' 
 
 class Map
   attr_reader :width, :height
@@ -100,7 +100,11 @@ end
 class Mamba
   attr_reader :head, :body, :dir
 
-  DIRECTION = { Gosu::KbUp    => [0, -1],
+  DIRECTION = { Gosu::KbW    => [0, -1],
+                Gosu::KbS  => [0, 1],
+                Gosu::KbA  => [-1, 0],
+                Gosu::KbD => [1, 0],
+                Gosu::KbUp    => [0, -1],
                 Gosu::KbDown  => [0, 1],
                 Gosu::KbLeft  => [-1, 0],
                 Gosu::KbRight => [1, 0] }
@@ -300,7 +304,7 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_bottom_text
-    draw_text("Move: Arrow Keys", TILE_WIDTH, TILE_WIDTH*19)
+    draw_text("Move: Arrows/WASD", TILE_WIDTH, TILE_WIDTH*19)
     draw_text("Un/pause: Space", TILE_WIDTH, TILE_WIDTH*20)
     draw_text("Reset Score: R", TILE_WIDTH, TILE_WIDTH*21)
     draw_text("Quit: Esc or Cmd+Q", TILE_WIDTH, TILE_WIDTH*22)
