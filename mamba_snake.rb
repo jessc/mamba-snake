@@ -9,11 +9,6 @@
 # Bug List:
 
 - Just keep throwing yourself at the problem!
-- snake head starts at the end of the snake,
-    rather than the front
-  - this causes the snake not to start moving immediately,
-      and to stretch weirdly if paused at start and diff direction
-      is chosen (press up-right quickly at beginning)
 - kind of has a glitchy feel where the snake "jumps" ahead,
     right before it catches the rabbit
   - think this is caused by the head being separate from the body
@@ -123,7 +118,7 @@ class Mamba
 
     @body = []
     (0..@start_size).each do |n|
-      @body << [(map_width / 2), (map_height / 2) + n]
+      @body << [(map_width / 2), (map_height / 2)]
     end
     @head = @body.pop
   end
