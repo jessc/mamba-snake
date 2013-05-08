@@ -9,25 +9,20 @@
 # Bug List:
 
 - Just keep throwing yourself at the problem!
-- when game starts, if a different direction that :right is chosen,
-    snake stretches weirdly (press up-right quickly)
-    - as if the head is not at the furthest right but is in the middle
-        of the snake
+- snake head starts at the end of the snake,
+    rather than the front
+  - this causes the snake not to start moving immediately,
+      and to stretch weirdly if paused at start and diff direction
+      is chosen (press up-right quickly at beginning)
 - kind of has a glitchy feel where the snake "jumps" ahead,
     right before it catches the rabbit
+  - think this is caused by the head being separate from the body
 - rabbit may still be able to respawn on the head of the snake?
-- snake doesn't immediately start moving at beginning of game
-    - I think it's because it's taking two steps to replace the white rabbit
-        with the black snake
-    - it looks like the head is at the end of the snake, rather than the start
-- config snake start pos
-- overlay "You died!\nPress Space to restart." when the game resets
 
 # TODO:
-- add timer
-- add instructions at top of screen
+- config snake start pos
 - allow for multiple rabbits
-- add highscore
+- add highscore, stopwatch, rabbits eaten features
 - multiplayer game
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
