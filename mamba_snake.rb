@@ -10,10 +10,8 @@
 
 - Just keep throwing yourself at the problem!
 
-
 # TODO:
 - config snake start pos
-- allow for multiple rabbits
 - multiplayer game
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
@@ -175,6 +173,7 @@ class MambaSnakeGame < Gosu::Window
   SNAKE_GROW_LENGTH = config['snake_grow_length']
   RABBIT_HOP_DISTANCE = config['rabbit_hop_distance']
   GAME_SPEED = config['game_speed']
+  NUM_OF_RABBITS = config['num_of_rabbits']
 
   def initialize
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, GAME_SPEED)
@@ -191,28 +190,31 @@ class MambaSnakeGame < Gosu::Window
     @dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+    @rabbits = []
+    NUM_OF_RABBITS.times { new_rabbit }
     update_snake
-    new_rabbit
   end
 
   def new_rabbit
     x, y = rand(MAP_WIDTH - 1), rand(MAP_HEIGHT - 1)
     if @map[x, y] == :empty
       @map[x, y] = :rabbit
-      @rabbit = Rabbit.new(x, y, RABBIT_HOP_DISTANCE)
+      @rabbits << Rabbit.new(x, y, RABBIT_HOP_DISTANCE)
     else
       new_rabbit
     end
   end
 
-  def update_rabbit
-    x, y = @rabbit.next_hop(*@rabbit.pos)
-    if @map[x, y] == :empty
-      @rabbit.pos = [x, y]
-    else
-      @rabbit.new_direction
+  def update_rabbits
+    @rabbits.each do |rabbit|
+      x, y = rabbit.next_hop(*rabbit.pos)
+      if @map[x, y] == :empty
+        rabbit.pos = [x, y]
+      else
+        rabbit.new_direction
+      end
+      rabbit.distance -= 1
     end
-    @rabbit.distance -= 1
   end
 
   def update_snake
@@ -231,16 +233,19 @@ class MambaSnakeGame < Gosu::Window
     @dead = false
     @time += 1
 
-    if @snake.head == @rabbit.pos
-      @rabbits_eaten += 1
-      if @rabbits_eaten > @highscore
-        @highscore += 1
+    @rabbits.each do |rabbit|
+      if @snake.head == rabbit.pos
+        @rabbits_eaten += 1
+        if @rabbits_eaten > @highscore
+          @highscore += 1
+        end
+        @rabbits.delete(rabbit)
+        new_rabbit
+        @snake.grow
       end
-      new_rabbit
-      @snake.grow
     end
     update_snake
-    update_rabbit
+    update_rabbits
 
     if snake_collide?
       @dead = true
@@ -258,11 +263,12 @@ class MambaSnakeGame < Gosu::Window
     draw_background
 
     # in these methods, remove magic numbers, replace with math
+    #   so that if the tile size is different it still works
     draw_top_text
     draw_you_died if @dead
     draw_bottom_text
 
-    draw_animal(@rabbit.pos, RABBIT_COLOR, Z::Rabbit)
+    @rabbits.each  { |rabbit| draw_animal(rabbit.pos, RABBIT_COLOR, Z::Rabbit) }
     @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
   end
 
@@ -296,8 +302,8 @@ class MambaSnakeGame < Gosu::Window
   def draw_bottom_text
     draw_text("Move: Arrow Keys", TILE_WIDTH, TILE_WIDTH*19)
     draw_text("Un/pause: Space", TILE_WIDTH, TILE_WIDTH*20)
-    draw_text("Restart and Clear Score: R", TILE_WIDTH, TILE_WIDTH*21)
-    draw_text("Quit: Escape or Command+Q", TILE_WIDTH, TILE_WIDTH*22)
+    draw_text("Reset Score: R", TILE_WIDTH, TILE_WIDTH*21)
+    draw_text("Quit: Esc or Cmd+Q", TILE_WIDTH, TILE_WIDTH*22)
   end
 
   def draw_text(text, x, y)
