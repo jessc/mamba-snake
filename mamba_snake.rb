@@ -9,7 +9,6 @@
 # Bug List:
 
 - Just keep throwing yourself at the problem!
-- rabbit may still be able to respawn on the head of the snake?
 
 # TODO:
 - config snake start pos
@@ -246,6 +245,7 @@ class MambaSnakeGame < Gosu::Window
     draw_border
     draw_background
 
+    # in these methods, remove magic numbers, replace with math
     draw_top_text
     draw_you_died if @dead
     draw_bottom_text
