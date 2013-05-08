@@ -9,9 +9,6 @@
 # Bug List:
 
 - Just keep throwing yourself at the problem!
-- kind of has a glitchy feel where the snake "jumps" ahead,
-    right before it catches the rabbit
-  - think this is caused by the head being separate from the body
 - rabbit may still be able to respawn on the head of the snake?
 
 # TODO:
@@ -232,8 +229,8 @@ class MambaSnakeGame < Gosu::Window
     @dead = false
 
     if @snake.head == @rabbit.pos
-      @snake.grow
       new_rabbit
+      @snake.grow
     end
     update_snake
     update_rabbit
