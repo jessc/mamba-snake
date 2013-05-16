@@ -11,15 +11,11 @@
 - Just keep throwing yourself at the problem!
 
 # TODO:
-- config snake start pos
-- multiplayer game
+- two player game
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
 - could go up trees to go to a new level, hunt for birds
-- snake could move diagonally
-- rabbits could exhibit swarm behavior
-- speed up snake with key presses or as it gets longer
-- snake could have boosts when you press a button to go faster
+- rabbits could exhibit swarm behavior (or a different animal that actually does this)
 
 =end
 
