@@ -12,6 +12,7 @@
 
 # TODO:
 - two player game
+ - first change snake to player1, then if player2 draw as well
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
 - could go up trees to go to a new level, hunt for birds
@@ -174,6 +175,9 @@ class MambaSnakeGame < Gosu::Window
   RABBIT_HOP_DISTANCE = config['rabbit_hop_distance']
   GAME_SPEED = config['game_speed']
   NUM_OF_RABBITS = config['num_of_rabbits']
+  TWO_PLAYER = config['two_player']
+  P1_SNAKE_COLOR = config['player1_snake_color']
+  P2_SNAKE_COLOR = config['player2_snake_color']
 
   def initialize
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, GAME_SPEED)
@@ -220,8 +224,6 @@ class MambaSnakeGame < Gosu::Window
   def update_snake
     @map[*@snake.update] = :empty
     @snake.body[1..-1].each { |x, y| @map[x, y] = :snake }
-    # obviously the head should be :snake, but how to get it to work?
-    # maybe if there is a next_head?
   end
 
   def snake_collide?
@@ -262,14 +264,15 @@ class MambaSnakeGame < Gosu::Window
     draw_border
     draw_background
 
-    # in these methods, remove magic numbers, replace with math
-    #   so that if the tile size is different it still works
     draw_top_text
     draw_you_died if @dead
     draw_bottom_text
 
     @rabbits.each  { |rabbit| draw_animal(rabbit.pos, RABBIT_COLOR, Z::Rabbit) }
     @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
+    if TWO_PLAYER
+      @p2_snake.each { |part| draw_animal(part, P2_SNAKE_COLOR, Z::Snake) }
+    end
   end
 
   def draw_border
