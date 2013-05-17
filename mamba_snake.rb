@@ -156,9 +156,9 @@ class MambaSnakeGame < Gosu::Window
   MAP_WIDTH = WINDOW_WIDTH / TILE_WIDTH
   MAP_HEIGHT = WINDOW_HEIGHT / TILE_WIDTH
 
-  COLORS = {BLACK: 0xff000000, GRAY: 0xff808080, WHITE: 0xffffffff,
-            AQUA: 0xff00ffff, RED: 0xffff0000, GREEN: 0xff00ff00,
-            BLUE: 0xff0000ff, YELLOW: 0xffffff00, FUCHSIA: 0xffff00ff,
+  COLORS = {BLACK: 0xff000000, GRAY: 0xff808080,   WHITE: 0xffffffff,
+            AQUA: 0xff00ffff,  RED: 0xffff0000,    GREEN: 0xff00ff00,
+            BLUE: 0xff0000ff,  YELLOW: 0xffffff00, FUCHSIA: 0xffff00ff,
             CYAN: 0xff00ffff}
 
   find_color = ->(color) { COLORS[config[color].upcase.to_sym] }
@@ -166,18 +166,19 @@ class MambaSnakeGame < Gosu::Window
 
   TOP_COLOR    = set_color.(find_color.('map_color'))
   BOTTOM_COLOR = set_color.(find_color.('map_color'))
-  TEXT_COLOR   = set_color.(find_color.('text_color'))
   BORDER_COLOR = set_color.(find_color.('border_color'))
-  SNAKE_COLOR  = set_color.(find_color.('snake_color'))
+  TEXT_COLOR   = set_color.(find_color.('text_color'))
+
   RABBIT_COLOR = set_color.(find_color.('rabbit_color'))
+  P1_SNAKE_COLOR = set_color.(find_color.('player1_snake_color'))
+  P2_SNAKE_COLOR = set_color.(find_color.('player2_snake_color'))
+  GAME_SPEED = config['game_speed']
   SNAKE_START_SIZE = config['snake_start_size']
   SNAKE_GROW_LENGTH = config['snake_grow_length']
   RABBIT_HOP_DISTANCE = config['rabbit_hop_distance']
-  GAME_SPEED = config['game_speed']
   NUM_OF_RABBITS = config['num_of_rabbits']
   TWO_PLAYER = config['two_player']
-  P1_SNAKE_COLOR = config['player1_snake_color']
-  P2_SNAKE_COLOR = config['player2_snake_color']
+
 
   def initialize
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, GAME_SPEED)
@@ -193,7 +194,7 @@ class MambaSnakeGame < Gosu::Window
     @rabbits_eaten = 0
     @dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    @snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+    @p1_snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
     @rabbits = []
     NUM_OF_RABBITS.times { new_rabbit }
     update_snake
@@ -222,12 +223,12 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def update_snake
-    @map[*@snake.update] = :empty
-    @snake.body[1..-1].each { |x, y| @map[x, y] = :snake }
+    @map[*@p1_snake.update] = :empty
+    @p1_snake.body[1..-1].each { |x, y| @map[x, y] = :snake }
   end
 
   def snake_collide?
-    (@map[*@snake.head] == :border) || (@map[*@snake.head] == :snake)
+    (@map[*@p1_snake.head] == :border) || (@map[*@p1_snake.head] == :snake)
   end
 
   def update
@@ -236,14 +237,14 @@ class MambaSnakeGame < Gosu::Window
     @time += 1
 
     @rabbits.each do |rabbit|
-      if @snake.head == rabbit.pos
+      if @p1_snake.head == rabbit.pos
         @rabbits_eaten += 1
         if @rabbits_eaten > @highscore
           @highscore += 1
         end
         @rabbits.delete(rabbit)
         new_rabbit
-        @snake.grow
+        @p1_snake.grow
       end
     end
     update_snake
@@ -269,7 +270,8 @@ class MambaSnakeGame < Gosu::Window
     draw_bottom_text
 
     @rabbits.each  { |rabbit| draw_animal(rabbit.pos, RABBIT_COLOR, Z::Rabbit) }
-    @snake.body.each { |part| draw_animal(part, SNAKE_COLOR, Z::Snake) }
+
+    @p1_snake.body.each { |part| draw_animal(part, P1_SNAKE_COLOR, Z::Snake) }
     if TWO_PLAYER
       @p2_snake.each { |part| draw_animal(part, P2_SNAKE_COLOR, Z::Snake) }
     end
@@ -294,7 +296,7 @@ class MambaSnakeGame < Gosu::Window
   def draw_top_text
     draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*1)
     draw_text("Time: #{@time}", TILE_WIDTH, TILE_WIDTH*2)
-    draw_text("Length: #{@snake.body.length}", TILE_WIDTH, TILE_WIDTH*3)
+    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*3)
     draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*4)
   end
 
@@ -332,7 +334,7 @@ class MambaSnakeGame < Gosu::Window
     close if (button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ))
     close if (button_down?(Gosu::KbRightMeta) && button_down?(Gosu::KbQ))
 
-    @snake.button_down(id)
+    @p1_snake.button_down(id)
   end
 end
 
