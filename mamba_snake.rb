@@ -270,6 +270,10 @@ class MambaSnakeGame < Gosu::Window
     draw_top_text
     draw_you_died if @dead
     draw_bottom_text
+    if TWO_PLAYER
+      draw_2p_top_text
+      draw_player_died # @player # say which player
+    end
 
     @rabbits.each  { |rabbit| draw_animal(rabbit.pos, RABBIT_COLOR, Z::Rabbit) }
 
@@ -307,10 +311,21 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_bottom_text
-    draw_text("Move: Arrows/WASD", TILE_WIDTH, TILE_WIDTH*19)
+    draw_text("P1 Move: Arrows", TILE_WIDTH, TILE_WIDTH*18)
+    draw_text("P2 Move: WASD", TILE_WIDTH, TILE_WIDTH*19)
     draw_text("Un/pause: Space", TILE_WIDTH, TILE_WIDTH*20)
     draw_text("Reset Score: R", TILE_WIDTH, TILE_WIDTH*21)
     draw_text("Quit: Esc or Cmd+Q", TILE_WIDTH, TILE_WIDTH*22)
+  end
+
+  def draw_2p_top_text
+    draw_text("P2 High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*1)
+    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*3)
+    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*4)
+  end
+
+  def draw_player_died
+    draw_text("Player #{which_player_died} died! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
   end
 
   def draw_text(text, x, y)
