@@ -13,10 +13,12 @@
 # TODO:
 - two player game
  - first change snake to player1, then if player2 draw as well
+ - the game will definitely have a different flow if it's two player,
+     how should that be done?
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
 - could go up trees to go to a new level, hunt for birds
-- rabbits could exhibit swarm behavior (or a different animal that actually does this)
+- rabbits could exhibit swarm behavior (or a different animal that exhibits this)
 
 =end
 
