@@ -313,10 +313,11 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_top_text
-    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*1)
-    draw_text("Time: #{@time}", TILE_WIDTH, TILE_WIDTH*2)
-    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*3)
-    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*4)
+    draw_text("Time: #{@time}", TILE_WIDTH, TILE_WIDTH*1)
+    draw_text("Player One", TILE_WIDTH, TILE_WIDTH*2)
+    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*3)
+    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*4)
+    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*5)
   end
 
   def draw_you_died
@@ -332,9 +333,10 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_2p_top_text
-    draw_text("P2 High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*1)
-    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*3)
-    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*4)
+    draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*7)
+    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*8)
+    draw_text("Length: #{@p2_snake.body.length}", TILE_WIDTH, TILE_WIDTH*9)
+    draw_text("Rabbits Eaten: #{@p2_rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*10)
   end
 
   def draw_player_died
