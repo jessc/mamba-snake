@@ -196,9 +196,11 @@ class MambaSnakeGame < Gosu::Window
     @rabbits_eaten = 0
     @dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    @p1_snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
     if TWO_PLAYER
-      @p2_snake = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+      @p1_snake = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+      @p2_snake = Mamba.new((MAP_WIDTH / 2) * 3, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+    else
+      @p1_snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)  
     end
     @rabbits = []
     NUM_OF_RABBITS.times { new_rabbit }
@@ -283,6 +285,7 @@ class MambaSnakeGame < Gosu::Window
     draw_top_text
     draw_player_died("One") if @dead
     draw_bottom_text
+
     if TWO_PLAYER
       draw_2p_top_text
       draw_player_died # @player # say which player
