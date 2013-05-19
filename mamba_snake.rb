@@ -186,7 +186,7 @@ class MambaSnakeGame < Gosu::Window
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, GAME_SPEED)
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
-    @highscore = 0
+    @p1_highscore = 0
     self.caption = TITLE
     new_game
   end
@@ -247,8 +247,8 @@ class MambaSnakeGame < Gosu::Window
     @rabbits.each do |rabbit|
       if @p1_snake.head == rabbit.pos
         @rabbits_eaten += 1
-        if @rabbits_eaten > @highscore
-          @highscore += 1
+        if @rabbits_eaten > @p1_highscore
+          @p1_highscore += 1
         end
         @rabbits.delete(rabbit)
         new_rabbit
@@ -273,7 +273,7 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def clear_score
-    @highscore = 0
+    @p1_highscore = 0
   end
 
   def draw
@@ -281,7 +281,7 @@ class MambaSnakeGame < Gosu::Window
     draw_background
 
     draw_top_text
-    draw_you_died if @dead
+    draw_player_died("One") if @dead
     draw_bottom_text
     if TWO_PLAYER
       draw_2p_top_text
@@ -314,14 +314,10 @@ class MambaSnakeGame < Gosu::Window
 
   def draw_top_text
     draw_text("Time: #{@time}", TILE_WIDTH, TILE_WIDTH*1)
-    draw_text("Player One", TILE_WIDTH, TILE_WIDTH*2)
-    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*3)
-    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*4)
-    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*5)
-  end
-
-  def draw_you_died
-    draw_text("You died! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
+    draw_text("Player One", TILE_WIDTH, TILE_WIDTH*3)
+    draw_text("High Score: #{@p1_highscore}", TILE_WIDTH, TILE_WIDTH*4)
+    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*5)
+    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*6)
   end
 
   def draw_bottom_text
@@ -333,14 +329,14 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_2p_top_text
-    draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*7)
-    draw_text("High Score: #{@highscore}", TILE_WIDTH, TILE_WIDTH*8)
-    draw_text("Length: #{@p2_snake.body.length}", TILE_WIDTH, TILE_WIDTH*9)
-    draw_text("Rabbits Eaten: #{@p2_rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*10)
+    draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*8)
+    draw_text("High Score: #{@p2_highscore}", TILE_WIDTH, TILE_WIDTH*9)
+    draw_text("Length: #{@p2_snake.body.length}", TILE_WIDTH, TILE_WIDTH*10)
+    draw_text("Rabbits Eaten: #{@p2_rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*11)
   end
 
-  def draw_player_died
-    draw_text("Player #{which_player_died} died! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
+  def draw_player_died(player)
+    draw_text("Player #{player} died! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
   end
 
   def draw_text(text, x, y)
