@@ -15,6 +15,7 @@
  - first change snake to player1, then if player2 draw as well
  - the game will definitely have a different flow if it's two player,
      how should that be done?
+ - should maintain a "kills" variable if two_player, when players kill each other
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
 - could go up trees to go to a new level, hunt for birds
@@ -279,6 +280,7 @@ class MambaSnakeGame < Gosu::Window
 
   def clear_score
     @p1_highscore = 0
+    @p2_highscore = 0
   end
 
   def draw
