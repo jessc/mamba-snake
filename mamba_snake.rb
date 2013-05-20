@@ -238,7 +238,8 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def snake_collide?(snake)
-    (@map[*snake.head] == :border) || (@map[*snake.head] == :p1_snake)
+    snake_labels = [:p1_snake, :p2_snake]
+    (@map[*snake.head] == :border) || snake_labels.include?(@map[*snake.head])
   end
 
   def update
