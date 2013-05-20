@@ -187,13 +187,15 @@ class MambaSnakeGame < Gosu::Window
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     @p1_highscore = 0
+    @p2_highscore = 0
     self.caption = TITLE
     new_game
   end
 
   def new_game
     @time = 0
-    @rabbits_eaten = 0
+    @p1_rabbits_eaten = 0
+    @p2_rabbits_eaten = 0
     @dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     if TWO_PLAYER
@@ -249,8 +251,8 @@ class MambaSnakeGame < Gosu::Window
 
     @rabbits.each do |rabbit|
       if @p1_snake.head == rabbit.pos
-        @rabbits_eaten += 1
-        if @rabbits_eaten > @p1_highscore
+        @p1_rabbits_eaten += 1
+        if @p1_rabbits_eaten > @p1_highscore
           @p1_highscore += 1
         end
         @rabbits.delete(rabbit)
