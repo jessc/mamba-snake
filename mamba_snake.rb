@@ -325,7 +325,7 @@ class MambaSnakeGame < Gosu::Window
     draw_text("Player One", TILE_WIDTH, TILE_WIDTH*3)
     draw_text("High Score: #{@p1_highscore}", TILE_WIDTH, TILE_WIDTH*4)
     draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*5)
-    draw_text("Rabbits Eaten: #{@rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*6)
+    draw_text("Rabbits Eaten: #{@p1_rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*6)
   end
 
   def draw_bottom_text
