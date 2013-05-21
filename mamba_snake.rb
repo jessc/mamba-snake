@@ -198,7 +198,7 @@ class MambaSnakeGame < Gosu::Window
 
   def new_game
     @time = 0
-    @dead = false unless @paused
+    @p1_dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     unless TWO_PLAYER
       @p1 = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)  
@@ -246,7 +246,8 @@ class MambaSnakeGame < Gosu::Window
 
   def snake_collide?(snake)
     snake_labels = [:p1, :p2]
-    (@map[*snake.head] == :border) || snake_labels.include?(@map[*snake.head])
+    (@map[*snake.head] == :border) ||
+      snake_labels.include?(@map[*snake.head])
   end
 
   def snakes_eating_rabbits
@@ -373,7 +374,7 @@ class MambaSnakeGame < Gosu::Window
 
   def draw_2p_top_text
     draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*9)
-    draw_text("High Score: #{@p2.highscore}", TILE_WIDTH, TILE_WIDTH*10)
+    draw_text("High Score: #{@p2_highscore}", TILE_WIDTH, TILE_WIDTH*10)
     draw_text("Length: #{@p2.body.length}", TILE_WIDTH, TILE_WIDTH*11)
     draw_text("Rabbits Eaten: #{@p2.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*12)
     draw_text("Kills: #{@p2_kills}", TILE_WIDTH, TILE_WIDTH*13)
