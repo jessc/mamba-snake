@@ -199,13 +199,12 @@ class MambaSnakeGame < Gosu::Window
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     unless TWO_PLAYER
       @p1 = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)  
-      @p1.rabbits_eaten = 0
     else
       @p1 = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
       @p2 = Mamba.new((MAP_WIDTH / 2) * 3, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
-      @p1.rabbits_eaten = 0
-      @p2.rabbits_eaten = 0
     end
+    @p1.rabbits_eaten = 0
+    @p2.rabbits_eaten = 0 if TWO_PLAYER
     @rabbits = []
     NUM_OF_RABBITS.times { new_rabbit }
     update_snake
@@ -235,14 +234,12 @@ class MambaSnakeGame < Gosu::Window
 
   def update_snake
     @map[*@p1.update] = :empty
-    @p1.body[1..-1].each { |x, y| @map[x, y] = :p1_snake }
-    if TWO_PLAYER
-      @p2.body[1..-1].each { |x, y| @map[x, y] = :p2_snake }
-    end
+    @p1.body[1..-1].each { |x, y| @map[x, y] = :p1 }
+    @p2.body[1..-1].each { |x, y| @map[x, y] = :p2 } if TWO_PLAYER
   end
 
   def snake_collide?(snake)
-    snake_labels = [:p1_snake, :p2_snake]
+    snake_labels = [:p1, :p2]
     (@map[*snake.head] == :border) || snake_labels.include?(@map[*snake.head])
   end
 
