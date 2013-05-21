@@ -189,9 +189,9 @@ class MambaSnakeGame < Gosu::Window
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     @p1_highscore = 0
-    @p2_highscore = 0
     @p1_kills = 0
-    @p2_kills = 0
+    @p2_highscore = 0 if TWO_PLAYER
+    @p2_kills = 0 if TWO_PLAYER
     self.caption = TITLE
     new_game
   end
@@ -238,7 +238,10 @@ class MambaSnakeGame < Gosu::Window
   def update_snake
     @map[*@p1.update] = :empty
     @p1.body[1..-1].each { |x, y| @map[x, y] = :p1 }
-    @p2.body[1..-1].each { |x, y| @map[x, y] = :p2 } if TWO_PLAYER
+    if TWO_PLAYER
+      @map[*@p2.update] = :empty
+      @p2.body[1..-1].each { |x, y| @map[x, y] = :p2 }
+    end
   end
 
   def snake_collide?(snake)
@@ -267,10 +270,18 @@ class MambaSnakeGame < Gosu::Window
       end
     end
   end
-  
+
+  def snake_kill?(snake1, snake2)
+    snake1.body.each do |part|
+      if snake2.head == part
+        return true
+      end
+    end
+  end
+
   def update
     return if @paused
-    @dead = false
+    @p1_dead = false
     @time += 1
 
     snakes_eating_rabbits
@@ -286,11 +297,11 @@ class MambaSnakeGame < Gosu::Window
     end
 
     if snake_collide? @p1
-      @dead = true
+      @p1_dead = true
       @paused = true
       new_game
       if TWO_PLAYER
-        if snake_collide @p2
+        if snake_collide? @p2
           @p2_dead = true
           @paused = true
           new_game
@@ -309,7 +320,7 @@ class MambaSnakeGame < Gosu::Window
     draw_background
 
     draw_top_text
-    draw_player_died("One") if @dead
+    draw_player_died("One") if @p1_dead
     draw_bottom_text
 
     if TWO_PLAYER
