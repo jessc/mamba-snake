@@ -99,6 +99,7 @@ end
 
 class Mamba
   attr_reader :head, :body, :dir
+  attr_accessor :rabbits_eaten, :highscore
 
   DIRECTION = { Gosu::KbW    => [0, -1],
                 Gosu::KbS  => [0, 1],
@@ -188,22 +189,22 @@ class MambaSnakeGame < Gosu::Window
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     @p1_highscore = 0
-    @p2_highscore = 0
     self.caption = TITLE
     new_game
   end
 
   def new_game
     @time = 0
-    @p1_rabbits_eaten = 0
-    @p2_rabbits_eaten = 0
     @dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
-    if TWO_PLAYER
-      @p1_snake = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
-      @p2_snake = Mamba.new((MAP_WIDTH / 2) * 3, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+    unless TWO_PLAYER
+      @p1 = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)  
+      @p1.rabbits_eaten = 0
     else
-      @p1_snake = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)  
+      @p1 = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+      @p2 = Mamba.new((MAP_WIDTH / 2) * 3, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+      @p1.rabbits_eaten = 0
+      @p2.rabbits_eaten = 0
     end
     @rabbits = []
     NUM_OF_RABBITS.times { new_rabbit }
@@ -233,10 +234,10 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def update_snake
-    @map[*@p1_snake.update] = :empty
-    @p1_snake.body[1..-1].each { |x, y| @map[x, y] = :p1_snake }
+    @map[*@p1.update] = :empty
+    @p1.body[1..-1].each { |x, y| @map[x, y] = :p1_snake }
     if TWO_PLAYER
-      @p2_snake.body[1..-1].each { |x, y| @map[x, y] = :p2_snake }
+      @p2.body[1..-1].each { |x, y| @map[x, y] = :p2_snake }
     end
   end
 
@@ -250,26 +251,34 @@ class MambaSnakeGame < Gosu::Window
     @dead = false
     @time += 1
 
-    @rabbits.each do |rabbit|
-      if @p1_snake.head == rabbit.pos
-        @p1_rabbits_eaten += 1
-        if @p1_rabbits_eaten > @p1_highscore
-          @p1_highscore += 1
+    unless TWO_PLAYER
+      snakes_eating = [@p1]
+    else
+      snakes_eating = [@p1, @p2]
+    end
+
+    snakes_eating.each do |snake|
+      @rabbits.each do |rabbit|
+        if snake.head == rabbit.pos
+          snake.rabbits_eaten += 1
+          if snake.rabbits_eaten > @p1_highscore
+            @p1_highscore += 1
+          end
+          @rabbits.delete(rabbit)
+          new_rabbit
+          snake.grow
         end
-        @rabbits.delete(rabbit)
-        new_rabbit
-        @p1_snake.grow
       end
     end
     update_snake
     update_rabbits
 
-    if snake_collide? @p1_snake
+    if snake_collide? @p1
       @dead = true
       @paused = true
       new_game
       if TWO_PLAYER
-        if snake_collide @p2_snake
+        if snake_collide @p2
           @p2_dead = true
           @paused = true
           new_game
@@ -280,7 +289,9 @@ class MambaSnakeGame < Gosu::Window
 
   def clear_score
     @p1_highscore = 0
-    @p2_highscore = 0
+    if TWO_PLAYER
+      @p2.highscore = 0
+    end
   end
 
   def draw
@@ -298,9 +309,9 @@ class MambaSnakeGame < Gosu::Window
 
     @rabbits.each  { |rabbit| draw_animal(rabbit.pos, RABBIT_COLOR, Z::Rabbit) }
 
-    @p1_snake.body.each { |part| draw_animal(part, P1_SNAKE_COLOR, Z::Snake) }
+    @p1.body.each { |part| draw_animal(part, P1_SNAKE_COLOR, Z::Snake) }
     if TWO_PLAYER
-      @p2_snake.each { |part| draw_animal(part, P2_SNAKE_COLOR, Z::Snake) }
+      @p2.body.each { |part| draw_animal(part, P2_SNAKE_COLOR, Z::Snake) }
     end
   end
 
@@ -324,8 +335,8 @@ class MambaSnakeGame < Gosu::Window
     draw_text("Time: #{@time}", TILE_WIDTH, TILE_WIDTH*1)
     draw_text("Player One", TILE_WIDTH, TILE_WIDTH*3)
     draw_text("High Score: #{@p1_highscore}", TILE_WIDTH, TILE_WIDTH*4)
-    draw_text("Length: #{@p1_snake.body.length}", TILE_WIDTH, TILE_WIDTH*5)
-    draw_text("Rabbits Eaten: #{@p1_rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*6)
+    draw_text("Length: #{@p1.body.length}", TILE_WIDTH, TILE_WIDTH*5)
+    draw_text("Rabbits Eaten: #{@p1.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*6)
   end
 
   def draw_bottom_text
@@ -338,9 +349,9 @@ class MambaSnakeGame < Gosu::Window
 
   def draw_2p_top_text
     draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*8)
-    draw_text("High Score: #{@p2_highscore}", TILE_WIDTH, TILE_WIDTH*9)
-    draw_text("Length: #{@p2_snake.body.length}", TILE_WIDTH, TILE_WIDTH*10)
-    draw_text("Rabbits Eaten: #{@p2_rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*11)
+    draw_text("High Score: #{@p2.highscore}", TILE_WIDTH, TILE_WIDTH*9)
+    draw_text("Length: #{@p2.body.length}", TILE_WIDTH, TILE_WIDTH*10)
+    draw_text("Rabbits Eaten: #{@p2.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*11)
   end
 
   def draw_player_died(player)
@@ -370,7 +381,7 @@ class MambaSnakeGame < Gosu::Window
     close if (button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ))
     close if (button_down?(Gosu::KbRightMeta) && button_down?(Gosu::KbQ))
 
-    @p1_snake.button_down(id)
+    @p1.button_down(id)
   end
 end
 
