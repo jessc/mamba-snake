@@ -189,7 +189,9 @@ class MambaSnakeGame < Gosu::Window
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     @p1_highscore = 0
+    @p2_highscore = 0
     @p1_kills = 0
+    @p2_kills = 0
     self.caption = TITLE
     new_game
   end
@@ -244,11 +246,7 @@ class MambaSnakeGame < Gosu::Window
     (@map[*snake.head] == :border) || snake_labels.include?(@map[*snake.head])
   end
 
-  def update
-    return if @paused
-    @dead = false
-    @time += 1
-
+  def snakes_eating_rabbits
     unless TWO_PLAYER
       snakes_eating = [@p1]
     else
@@ -268,6 +266,14 @@ class MambaSnakeGame < Gosu::Window
         end
       end
     end
+  end
+  
+  def update
+    return if @paused
+    @dead = false
+    @time += 1
+
+    snakes_eating_rabbits
     update_snake
     update_rabbits
 
@@ -293,11 +299,9 @@ class MambaSnakeGame < Gosu::Window
     end
   end
 
-  def clear_score
+  def reset_score
     @p1_highscore = 0
-    if TWO_PLAYER
-      @p2.highscore = 0
-    end
+    @p2_highscore = 0 if TWO_PLAYER
   end
 
   def draw
@@ -361,7 +365,7 @@ class MambaSnakeGame < Gosu::Window
     draw_text("High Score: #{@p2.highscore}", TILE_WIDTH, TILE_WIDTH*10)
     draw_text("Length: #{@p2.body.length}", TILE_WIDTH, TILE_WIDTH*11)
     draw_text("Rabbits Eaten: #{@p2.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*12)
-    draw_text("Kills: #{@p2_kills}", TILE_WIDTH, TILE_WIDTH*7)
+    draw_text("Kills: #{@p2_kills}", TILE_WIDTH, TILE_WIDTH*13)
   end
 
   def draw_player_died(player)
@@ -384,7 +388,8 @@ class MambaSnakeGame < Gosu::Window
     case id
     when Gosu::KbSpace  then @paused = !@paused
     when Gosu::KbEscape then close
-    when Gosu::KbR      then clear_score && new_game
+    # why isn't this starting a new_game ?
+    when Gosu::KbR      then reset_score && new_game
     when Gosu::KbE      then @map.display
     end
 
