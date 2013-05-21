@@ -99,7 +99,7 @@ end
 
 class Mamba
   attr_reader :head, :body, :dir
-  attr_accessor :rabbits_eaten, :highscore
+  attr_accessor :rabbits_eaten, :highscore, :kills
 
   DIRECTION = { Gosu::KbW    => [0, -1],
                 Gosu::KbS  => [0, 1],
@@ -189,6 +189,7 @@ class MambaSnakeGame < Gosu::Window
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     @p1_highscore = 0
+    @p1_kills = 0
     self.caption = TITLE
     new_game
   end
@@ -270,6 +271,14 @@ class MambaSnakeGame < Gosu::Window
     update_snake
     update_rabbits
 
+    if TWO_PLAYER
+      if snake_kill?(@p1, @p2)
+        @p1_kills += 1
+      elsif snake_kill?(@p2, @p1)
+        @p2_kills += 1
+      end
+    end
+
     if snake_collide? @p1
       @dead = true
       @paused = true
@@ -334,6 +343,9 @@ class MambaSnakeGame < Gosu::Window
     draw_text("High Score: #{@p1_highscore}", TILE_WIDTH, TILE_WIDTH*4)
     draw_text("Length: #{@p1.body.length}", TILE_WIDTH, TILE_WIDTH*5)
     draw_text("Rabbits Eaten: #{@p1.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*6)
+    if TWO_PLAYER
+      draw_text("Kills: #{@p1_kills}", TILE_WIDTH, TILE_WIDTH*7)
+    end
   end
 
   def draw_bottom_text
@@ -345,10 +357,11 @@ class MambaSnakeGame < Gosu::Window
   end
 
   def draw_2p_top_text
-    draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*8)
-    draw_text("High Score: #{@p2.highscore}", TILE_WIDTH, TILE_WIDTH*9)
-    draw_text("Length: #{@p2.body.length}", TILE_WIDTH, TILE_WIDTH*10)
-    draw_text("Rabbits Eaten: #{@p2.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*11)
+    draw_text("Player Two", TILE_WIDTH, TILE_WIDTH*9)
+    draw_text("High Score: #{@p2.highscore}", TILE_WIDTH, TILE_WIDTH*10)
+    draw_text("Length: #{@p2.body.length}", TILE_WIDTH, TILE_WIDTH*11)
+    draw_text("Rabbits Eaten: #{@p2.rabbits_eaten}", TILE_WIDTH, TILE_WIDTH*12)
+    draw_text("Kills: #{@p2_kills}", TILE_WIDTH, TILE_WIDTH*7)
   end
 
   def draw_player_died(player)
