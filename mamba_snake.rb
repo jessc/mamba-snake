@@ -101,16 +101,21 @@ class Mamba
   attr_reader :head, :body, :dir
   attr_accessor :rabbits_eaten, :highscore, :kills
 
-  DIRECTION = { Gosu::KbW    => [0, -1],
-                Gosu::KbS  => [0, 1],
-                Gosu::KbA  => [-1, 0],
-                Gosu::KbD => [1, 0],
-                Gosu::KbUp    => [0, -1],
-                Gosu::KbDown  => [0, 1],
-                Gosu::KbLeft  => [-1, 0],
-                Gosu::KbRight => [1, 0] }
-
-  def initialize(map_width, map_height, start_size, grow_length)
+  def initialize(map_width, map_height, start_size, grow_length, player_number)
+    # for some reason not working when "two"?
+    @direction = case player_number
+                 when "one"
+                   { Gosu::KbUp    => [0, -1],
+                     Gosu::KbDown  => [0, 1],
+                     Gosu::KbLeft  => [-1, 0],
+                     Gosu::KbRight => [1, 0] }
+                 when "two"
+                   { Gosu::KbW  => [0, -1],
+                     Gosu::KbS  => [0, 1],
+                     Gosu::KbA  => [-1, 0],
+                     Gosu::KbD  => [1, 0] }
+                 end
+    p @direction
     @dir = Gosu::KbUp
     @start_size = start_size
     @grow_length = grow_length
@@ -123,8 +128,9 @@ class Mamba
   end
 
   def update
-    @head[0] += DIRECTION[@dir][0]
-    @head[1] += DIRECTION[@dir][1]
+    p @direction[@dir]
+    @head[0] += @direction[@dir][0]
+    @head[1] += @direction[@dir][1]
 
     @body.unshift [@head[0], @head[1]]
     @body.pop
@@ -135,9 +141,9 @@ class Mamba
   end
 
   def button_down(id)
-    if DIRECTION.keys.include?(id)
-      next_head = [@head[0] + DIRECTION[id][0],
-                   @head[1] + DIRECTION[id][1]]
+    if @direction.keys.include?(id)
+      next_head = [@head[0] + @direction[id][0],
+                   @head[1] + @direction[id][1]]
       unless @body.include?(next_head)
         @dir = id
       end
@@ -201,10 +207,13 @@ class MambaSnakeGame < Gosu::Window
     @p1_dead = false unless @paused
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     unless TWO_PLAYER
-      @p1 = Mamba.new(MAP_WIDTH, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)  
+      @p1 = Mamba.new(MAP_WIDTH, MAP_HEIGHT,
+                      SNAKE_START_SIZE, SNAKE_GROW_LENGTH, "one")
     else
-      @p1 = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
-      @p2 = Mamba.new((MAP_WIDTH / 2) * 3, MAP_HEIGHT, SNAKE_START_SIZE, SNAKE_GROW_LENGTH)
+      @p1 = Mamba.new(MAP_WIDTH / 2, MAP_HEIGHT,
+                      SNAKE_START_SIZE, SNAKE_GROW_LENGTH, "one")
+      @p2 = Mamba.new((MAP_WIDTH / 2) * 3, MAP_HEIGHT,
+                      SNAKE_START_SIZE, SNAKE_GROW_LENGTH, "two")
     end
     @p1.rabbits_eaten = 0
     @p2.rabbits_eaten = 0 if TWO_PLAYER
