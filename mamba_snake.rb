@@ -102,7 +102,6 @@ class Mamba
   attr_accessor :rabbits_eaten, :highscore, :kills
 
   def initialize(map_width, map_height, start_size, grow_length, player_number)
-    # for some reason not working when "two"?
     @direction = case player_number
                  when "one"
                    { Gosu::KbUp    => [0, -1],
@@ -115,8 +114,10 @@ class Mamba
                      Gosu::KbA  => [-1, 0],
                      Gosu::KbD  => [1, 0] }
                  end
-    p @direction
-    @dir = Gosu::KbUp
+    @dir = case player_number
+           when "one" then Gosu::KbUp
+           when "two" then Gosu::KbW
+           end
     @start_size = start_size
     @grow_length = grow_length
 
@@ -128,7 +129,6 @@ class Mamba
   end
 
   def update
-    p @direction[@dir]
     @head[0] += @direction[@dir][0]
     @head[1] += @direction[@dir][1]
 
