@@ -192,13 +192,13 @@ class MambaSnakeGame < Gosu::Window
 
   def initialize
     super(WINDOW_WIDTH, WINDOW_HEIGHT, false, GAME_SPEED)
+    self.caption = TITLE
     @font = Gosu::Font.new(self, Gosu.default_font_name, 20)
     @paused = false
     @p1_highscore = 0
     @p1_kills = 0
     @p2_highscore = 0 if TWO_PLAYER
     @p2_kills = 0 if TWO_PLAYER
-    self.caption = TITLE
     new_game
   end
 
@@ -292,32 +292,31 @@ class MambaSnakeGame < Gosu::Window
   def update
     return if @paused
     @p1_dead = false
+    @p2_dead = false
     @time += 1
 
     snakes_eating_rabbits
     update_snake
     update_rabbits
 
+    if snake_collide? @p1
+      @p1_dead = true
+      @paused = true
+      new_game
+    end
+
     if TWO_PLAYER
       if snake_kill?(@p1, @p2)
         @p1_kills += 1
       elsif snake_kill?(@p2, @p1)
         @p2_kills += 1
+      elsif snake_collide? @p2
+        @p2_dead = true
+        @paused = true
+        new_game
       end
     end
 
-    if snake_collide? @p1
-      @p1_dead = true
-      @paused = true
-      new_game
-      if TWO_PLAYER
-        if snake_collide? @p2
-          @p2_dead = true
-          @paused = true
-          new_game
-        end
-      end
-    end
   end
 
   def reset_score
@@ -331,6 +330,7 @@ class MambaSnakeGame < Gosu::Window
 
     draw_top_text
     draw_player_died("One") if @p1_dead
+    draw_player_died("Two") if @p2_dead
     draw_bottom_text
 
     if TWO_PLAYER
