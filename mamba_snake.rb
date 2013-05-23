@@ -4,6 +4,7 @@
 # Jesse Cummins
 # https://github.com/jessc
 # with advice from Ryan Metzler
+# https://github.com/rkmetzl
 
 =begin
 # Bug List:
@@ -15,11 +16,13 @@
  - first change snake to player1, then if player2 draw as well
  - the game will definitely have a different flow if it's two player,
      how should that be done?
- - should maintain a "kills" variable if two_player, when players kill each other
+ - should maintain a "kills" variable if two_player,
+     when players kill each other
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
 - could go up trees to go to a new level, hunt for birds
-- rabbits could exhibit swarm behavior (or a different animal that exhibits this)
+- rabbits could exhibit swarm behavior
+    (or a different animal that exhibits this)
 
 =end
 
@@ -159,7 +162,7 @@ class MambaSnakeGame < Gosu::Window
 
   config = YAML.load_file 'config.yaml'
 
-  TITLE = 'Hungry Mamba!'
+  TITLE = 'Hungry Mamba Snake!'
   WINDOW_WIDTH = config['window_width']
   WINDOW_HEIGHT = config['window_height']
   TILE_WIDTH = config['tile_width']

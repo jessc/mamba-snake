@@ -28,9 +28,6 @@ A snake-like game with moving rabbits to eat!
 
 ## Contributing
 
- - add highscore
- - multiple rabbits
-   - rabbits breed when two are within 5 squares of each other (a baby is born between them)
  - adjust difficulty
    - how many spaces rabbit can hop at a time
    - number of hops the rabbit makes before turning
@@ -41,5 +38,6 @@ A snake-like game with moving rabbits to eat!
 
  - <https://github.com/mmorin/Snake-2>
  - <https://github.com/ThomasPedersen/rubysnake>
- - Ryan Metzler
+ - [Ryan Metzler](https://github.com/rkmetzl)
+ 
 
