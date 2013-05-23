@@ -23,7 +23,10 @@
 - could go up trees to go to a new level, hunt for birds
 - rabbits could exhibit swarm behavior
     (or a different animal that exhibits this)
-
+- perhaps rewrite to use shoes rather than gosu because
+    gosu has a sort of "kludgy" feel about it,
+      specifically with being unable to directly draw
+        when you want
 =end
 
 require 'gosu' 
