@@ -51,15 +51,6 @@ class Map
     x == 0 || x == @width - 1 || y == 0 || y == @height - 1
   end
 
-  def display
-    (0...@height).each do |y|
-      (0...@width).each do |x|
-        print @map[[x, y]].to_s[0]
-      end
-      p ''
-    end
-  end
-
   def [](x, y)
     @map[[x, y]]
   end
