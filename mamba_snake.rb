@@ -420,8 +420,10 @@ class MambaSnakeGame < Gosu::Window
     case id
     when Gosu::KbSpace  then @paused = !@paused
     when Gosu::KbEscape then close
-    # why isn't this starting a new_game ?
-    when Gosu::KbR      then reset_score && new_game
+    when Gosu::KbR
+      reset_score
+      @paused = true
+      new_game
     when Gosu::KbE      then @map.display
     end
 
