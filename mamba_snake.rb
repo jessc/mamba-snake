@@ -202,6 +202,8 @@ class MambaSnakeGame < Gosu::Window
   def new_game
     @time = 0
     @p1_dead = false unless @paused
+    @p1_killed = false
+    @p2_killed = false
     @map = Map.new(MAP_WIDTH, MAP_HEIGHT)
     unless TWO_PLAYER
       @p1 = Mamba.new(MAP_WIDTH, MAP_HEIGHT,
@@ -305,8 +307,14 @@ class MambaSnakeGame < Gosu::Window
     if TWO_PLAYER
       if snake_kill?(@p1, @p2)
         @p1_kills += 1
+        @p1_killed = true
+        @paused = true
+        new_game
       elsif snake_kill?(@p2, @p1)
         @p2_kills += 1
+        @p2_killed = true
+        @paused = true
+        new_game
       elsif snake_collide? @p2
         @p2_dead = true
         @paused = true
@@ -328,6 +336,8 @@ class MambaSnakeGame < Gosu::Window
     draw_top_text
     draw_player_died("One") if @p1_dead
     draw_player_died("Two") if @p2_dead
+    draw_player_killed("One", "Two") if @p1_killed
+    draw_player_killed("Two", "One") if @p2_killed
     draw_bottom_text
 
     if TWO_PLAYER
@@ -388,6 +398,10 @@ class MambaSnakeGame < Gosu::Window
 
   def draw_player_died(player)
     draw_text("Player #{player} died! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
+  end
+
+  def draw_player_killed(player1, player2)
+    draw_text("Player #{player1} killed Player #{player2}! Press space.", TILE_WIDTH*11, TILE_WIDTH*5)
   end
 
   def draw_text(text, x, y)
