@@ -215,7 +215,11 @@ class MambaSnakeGame < Gosu::Window
                       SNAKE_START_SIZE, SNAKE_GROW_LENGTH, "two")
     end
     @p1.rabbits_eaten = 0
-    @p2.rabbits_eaten = 0 if TWO_PLAYER
+    @p1.highscore = @p1_highscore
+    if TWO_PLAYER
+      @p2.rabbits_eaten = 0
+      @p2.highscore = @p2_highscore
+    end
     @rabbits = []
     NUM_OF_RABBITS.times { new_rabbit }
     update_snake
@@ -269,8 +273,8 @@ class MambaSnakeGame < Gosu::Window
       @rabbits.each do |rabbit|
         if snake.head == rabbit.pos
           snake.rabbits_eaten += 1
-          if snake.rabbits_eaten > @p1_highscore
-            @p1_highscore += 1
+          if snake.rabbits_eaten > snake.highscore
+            snake.highscore += 1
           end
           @rabbits.delete(rabbit)
           new_rabbit
@@ -278,6 +282,9 @@ class MambaSnakeGame < Gosu::Window
         end
       end
     end
+    
+    @p1_highscore = @p1.highscore
+    @p2_highscore = @p2.highscore if TWO_PLAYER
   end
 
   def snake_kill?(snake1, snake2)
