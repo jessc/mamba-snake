@@ -295,6 +295,11 @@ class MambaSnakeGame < Gosu::Window
     end
   end
 
+  def restart_game
+    @paused = true
+    new_game
+  end
+
   def update
     return if @paused
     @p1_dead = false
@@ -307,25 +312,21 @@ class MambaSnakeGame < Gosu::Window
 
     if snake_collide? @p1
       @p1_dead = true
-      @paused = true
-      new_game
+      restart_game
     end
 
     if TWO_PLAYER
       if snake_kill?(@p1, @p2)
         @p1_kills += 1
         @p1_killed = true
-        @paused = true
-        new_game
+        restart_game
       elsif snake_kill?(@p2, @p1)
         @p2_kills += 1
         @p2_killed = true
-        @paused = true
-        new_game
+        restart_game
       elsif snake_collide? @p2
         @p2_dead = true
-        @paused = true
-        new_game
+        restart_game
       end
     end
 
