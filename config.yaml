@@ -22,4 +22,6 @@
 "rabbit_hop_distance": 5
 "num_of_rabbits": 5
 
-"two_player": false
+"two_player": true
+
+# "two_player": false

@@ -315,6 +315,7 @@ class MambaSnakeGame < Gosu::Window
       restart_game
     end
 
+    # player_one
     if TWO_PLAYER
       if snake_kill?(@p1, @p2)
         @p1_kills += 1
@@ -350,7 +351,6 @@ class MambaSnakeGame < Gosu::Window
 
     if TWO_PLAYER
       draw_2p_top_text
-      draw_player_died # @player # say which player
     end
 
     @rabbits.each  { |rabbit| draw_animal(rabbit.pos, RABBIT_COLOR, Z::Rabbit) }
