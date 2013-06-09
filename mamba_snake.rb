@@ -345,7 +345,9 @@ class MambaSnakeGame < Gosu::Window
     draw_top_text
     draw_player_died("One") if @p1_dead
     draw_player_died("Two") if @p2_dead
-    p @p1_is_killed
+    # "p @p1_is_killed" and "p @p1_dead"
+    # are always displaying false,
+    # even when @p1_kills are going up?
     draw_player_killed("One", "Two") if @p2_is_killed
     draw_player_killed("Two", "One") if @p1_is_killed
     draw_bottom_text
