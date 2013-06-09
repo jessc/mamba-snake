@@ -432,10 +432,11 @@ class MambaSnakeGame < Gosu::Window
     when Gosu::KbSpace  then @paused = !@paused
     when Gosu::KbEscape then close
     when Gosu::KbR
+      # Why is this not resetting the scores
+      # and starting a new game?
       reset_score
       @paused = true
       new_game
-    when Gosu::KbE      then @map.display
     end
 
     close if (button_down?(Gosu::KbLeftMeta) && button_down?(Gosu::KbQ))
