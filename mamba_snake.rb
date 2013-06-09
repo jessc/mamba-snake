@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# 2013-05
+# 2013-06
 # Jesse Cummins
 # https://github.com/jessc
 # with advice from Ryan Metzler
@@ -13,20 +13,11 @@
 
 # TODO:
 - two player game
- - first change snake to player1, then if player2 draw as well
- - the game will definitely have a different flow if it's two player,
-     how should that be done?
- - should maintain a "kills" variable if two_player,
-     when players kill each other
 - play against a snake AI
 - rabbits can breed when near each other, grow old and die
 - could go up trees to go to a new level, hunt for birds
 - rabbits could exhibit swarm behavior
     (or a different animal that exhibits this)
-- perhaps rewrite to use shoes rather than gosu because
-    gosu has a sort of "kludgy" feel about it,
-      specifically with being unable to directly draw
-        when you want
 =end
 
 require 'gosu' 
