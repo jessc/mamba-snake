@@ -313,7 +313,10 @@ class MambaSnakeGame < Gosu::Window
       end
     end
 
-    # player_one
+    # For some reason p1 is always killing p2 at the
+    # beginning of the game, but when debugging code
+    # is put in snake_kill?, it shows p2's head is not
+    # hitting a body part of p1, so what is going on?
     # if TWO_PLAYER
     #   if snake_kill?(@p1, @p2)
     #     @p1_kills += 1
@@ -324,9 +327,6 @@ class MambaSnakeGame < Gosu::Window
     #     @p2_kills += 1
     #     @p1_is_killed = true
     #     @p1_dead = true
-    #     restart_game
-    #   elsif snake_collide? @p2
-    #     @p2_dead = true
     #     restart_game
     #   end
     # end
@@ -432,8 +432,6 @@ class MambaSnakeGame < Gosu::Window
     when Gosu::KbSpace  then @paused = !@paused
     when Gosu::KbEscape then close
     when Gosu::KbR
-      # Why is this not resetting the scores
-      # and starting a new game?
       reset_score
       @paused = true
       new_game
