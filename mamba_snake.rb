@@ -311,10 +311,12 @@ class MambaSnakeGame < Gosu::Window
       if snake_kill?(@p1, @p2)
         @p1_kills += 1
         @p2_is_killed = true
+        @p2_dead = true
         restart_game
       elsif snake_kill?(@p2, @p1)
         @p2_kills += 1
         @p1_is_killed = true
+        @p1_dead = true
         restart_game
       elsif snake_collide? @p2
         @p2_dead = true
@@ -440,7 +442,7 @@ end
 
 MambaSnakeGame.new.show
 
-=begin 
+=begin
 
 two_player bugs:
 - kills for player_one going up
